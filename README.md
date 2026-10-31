@@ -10,66 +10,46 @@ The School Library System is a web-based application designed to help manage sch
 
 | Member | GitHub username | Tables owned | CRUD resource | Join report and Join type | Feature role |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| Member 1 | `@username1` | `admins`, `students`, `activity_logs` | Students | Students Without Borrowing Records (`LEFT JOIN`) | Student and Admin Management |
+| Member 1 | `@jhormvybondad787-a11y` | `admins`, `students`, `activity_logs` | Students | Students Without Borrowing Records (`LEFT JOIN`) | Student and Admin Management |
 | Member 2 | `@Dev-Hisayuki` | `categories`, `authors`, `publishers`, `books` | Books | Book Catalog with Category, Author, and Publisher (`INNER JOIN`) | Book Management |
 | Member 3 | `@Robren2005` | `book_copies`, `borrow_transactions`, `returns` | Borrowing Transactions | Borrowing History (`INNER JOIN`) | Borrowing and Returning |
 | Member 4 | `@kurtalvarado05-coder` | `reservations`, `penalties`, `borrowing_policies` | Reservations | Overdue and Penalty Report (`FULL OUTER JOIN / UNION`) | Reservations and Penalties |
 
 # Repository Structure
 
-School-Library-System/
-│
-├── app/                         # Main application folder
-│   ├── config/                  
-│   │   └── db.js                # Database connection pool setup[cite: 4]
-│   │
-│   ├── models/                  # Models: Talk to DB, validation, SQL queries & joins[cite: 5]
-│   │   ├── modelA_studentAdmin.js      # Member A: admins, students, activity_logs
-│   │   ├── modelB_bookManagement.js    # Member B: categories, authors, publishers, books
-│   │   ├── modelC_borrowReturn.js      # Member C: book_copies, borrow_transactions, returns
-│   │   └── modelD_policyReservation.js # Member D: reservations, borrowing_policies, book_conditions
-│   │
-│   ├── controllers/             # Controllers: Request handling, status codes, responses[cite: 5]
-│   │   ├── controllerA_studentAdmin.js      # Member A logic
-│   │   ├── controllerB_bookManagement.js    # Member B logic
-│   │   ├── controllerC_borrowReturn.js      # Member C logic
-│   │   └── controllerD_policyReservation.js # Member D logic
-│   │
-│   ├── routes/                  # Routes: Endpoint routing for GET, POST, PUT/PATCH, DELETE[cite: 5]
-│   │   ├── routesA_studentAdmin.js      # Member A routes
-│   │   ├── routesB_bookManagement.js    # Member B routes
-│   │   ├── routesC_borrowReturn.js      # Member C routes
-│   │   └── routesD_policyReservation.js # Member D routes
-│   │
-│   ├── middleware/              
-│   │   └── errorHandler.js      # Global API error handler and status code manager[cite: 5]
-│   │
-│   ├── screens/                 # Frontend client screens (React, Vue, or UI templates)
-│   │   ├── ScreenA_studentAdmin.jsx     # Member A UI
-│   │   ├── ScreenB_bookManagement.jsx   # Member B UI
-│   │   ├── ScreenC_borrowReturn.jsx     # Member C UI
-│   │   └── ScreenD_policyReservation.jsx# Member D UI
-│   │
-│   └── server.js                # Main application entry point (Express server)
-│
-├── database/                    # Database setup and files
-│   ├── slices/                  # Individual member SQL slice files
-│   │   ├── sliceA_studentAdmin.sql
-│   │   ├── sliceB_bookManagement.sql
-│   │   ├── sliceC_borrowReturn.sql
-│   │   └── sliceD_policyReservation.sql
-│   └── library_management.sql   # Complete combined schema & seed SQL file
-│
-├── docs/                        # Documentation and diagrams
-│   ├── slices/                  # Member markdown documentation slices
-│   │   ├── sliceA_studentAdmin.md
-│   │   ├── sliceB_bookManagement.md
-│   │   ├── sliceC_borrowReturn.md
-│   │   └── sliceD_policyReservation.md
-│   └── er-diagram.png           # Exported ER Diagram image for your README
-│
-├── .env.example                 # Environment variables template (DB host, port, user, pass)[cite: 14]
-├── .gitattributes               # Git attributes configuration
-├── .gitignore                   # Git ignore rules
-├── package.json                 # Node.js dependencies and scripts
-└── README.md                    # Group roster, run instructions, and Ownership Matrix[cite: 7, 14]
+| Layer / Directory | File Path / Component | Description |
+| :--- | :--- | :--- |
+| **Configuration & Root** | `.env.example` | Template for environment variables (Database host, port, user, password) |
+| | `.gitattributes` | Git attributes configuration file |
+| | `.gitignore` | Defines files and directories ignored by Git |
+| | `package.json` | Node.js project manifest, dependencies, and execution scripts |
+| | `README.md` | Root documentation containing group roster, setup instructions, and Ownership Matrix |
+| **App Root & Database Config** | `app/server.js` | Main application entry point for the Express server |
+| | `app/config/db.js` | Database connection setup and connection pool configuration |
+| | `app/middleware/errorHandler.js` | Global API error handling middleware and status code management |
+| **Models (`app/models/`)** | `modelA_studentAdmin.js` | **Member A:** Handles `admins`, `students`, and `activity_logs` data queries |
+| | `modelB_bookManagement.js` | **Member B:** Handles `categories`, `authors`, `publishers`, and `books` data queries |
+| | `modelC_borrowReturn.js` | **Member C:** Handles `book_copies`, `borrow_transactions`, and `returns` data queries |
+| | `modelD_policyReservation.js` | **Member D:** Handles `reservations`, `borrowing_policies`, and `book_conditions` data queries |
+| **Controllers (`app/controllers/`)** | `controllerA_studentAdmin.js` | **Member A:** Request handling and business logic for Student & Admin Management |
+| | `controllerB_bookManagement.js` | **Member B:** Request handling and business logic for Book Management |
+| | `controllerC_borrowReturn.js` | **Member C:** Request handling and business logic for Borrowing & Returning |
+| | `controllerD_policyReservation.js` | **Member D:** Request handling and business logic for Policy & Reservations |
+| **Routes (`app/routes/`)** | `routesA_studentAdmin.js` | **Member A:** REST API routes for Student & Admin endpoints |
+| | `routesB_bookManagement.js` | **Member B:** REST API routes for Book Management endpoints |
+| | `routesC_borrowReturn.js` | **Member C:** REST API routes for Borrowing & Returning endpoints |
+| | `routesD_policyReservation.js` | **Member D:** REST API routes for Policy & Reservation endpoints |
+| **Screens (`app/screens/`)** | `ScreenA_studentAdmin.jsx` | **Member A:** Frontend UI view for Student and Admin Management |
+| | `ScreenB_bookManagement.jsx` | **Member B:** Frontend UI view for Book Management |
+| | `ScreenC_borrowReturn.jsx` | **Member C:** Frontend UI view for Borrowing and Returning |
+| | `ScreenD_policyReservation.jsx` | **Member D:** Frontend UI view for Reservations and Policy Management |
+| **Database (`database/`)** | `database/library_management.sql` | Complete combined schema and seed SQL file for initialization |
+| | `database/slices/sliceA_studentAdmin.sql` | **Member A:** SQL table definitions and queries slice |
+| | `database/slices/sliceB_bookManagement.sql` | **Member B:** SQL table definitions and queries slice |
+| | `database/slices/sliceC_borrowReturn.sql` | **Member C:** SQL table definitions and queries slice |
+| | `database/slices/sliceD_policyReservation.sql` | **Member D:** SQL table definitions and queries slice |
+| **Documentation (`docs/`)** | `docs/er-diagram.png` | Exported Entity-Relationship Diagram for system visualization |
+| | `docs/slices/sliceA_studentAdmin.md` | **Member A:** Detailed documentation slice |
+| | `docs/slices/sliceB_bookManagement.md` | **Member B:** Detailed documentation slice |
+| | `docs/slices/sliceC_borrowReturn.md` | **Member C:** Detailed documentation slice |
+| | `docs/slices/sliceD_policyReservation.md` | **Member D:** Detailed documentation slice |
