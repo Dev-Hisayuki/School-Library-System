@@ -19,6 +19,64 @@ This project is more than a simple database program because of its automated bus
 
 ---
 
+## System Architecture
+
+```
+┌─────────────────────────────────────────┐
+│        Administrator's Computer         │
+└────────────────────┬────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│                 Website                 │
+│         HTML, CSS, JavaScript           │
+└────────────────────┬────────────────────┘
+                     │ (REST API Requests)
+                     ▼
+┌─────────────────────────────────────────┐
+│            Node.js + Express            │
+│      Controllers | Models | Routes      │
+└────────────────────┬────────────────────┘
+                     │ (SQL Database Driver)
+                     ▼
+┌─────────────────────────────────────────┐
+│             Local Database              │
+│    Database files saved on computer     │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## System Flowchart
+
+```
+                 [ ADMIN LOGIN ]
+                        │
+                        ▼
+                   [ DASHBOARD ]
+                        │
+          ┌─────────────┴─────────────┐
+          ▼                           ▼
+      [ BOOKS ]                 [ CATEGORIES ]
+          │
+     ┌────┴─────┐
+     ▼          ▼
+  [ BORROW ] [ RETURN ]
+     │          │
+     ▼          ▼
+  [ BORROW   [ RETURN
+  DETAILS ]  DETAILS ]
+     │          │
+     └────┬─────┘
+          ▼
+   [ BORROW LOGS ]
+          │
+          ▼
+    [ FINE ALERTS ]
+```
+
+---
+
 ## Ownership Matrix (Section 5.4 Compliance)
 
 Each member owns their feature area end-to-end (Tables, Models, Controllers, Routes, Frontend Screen, and SQL Join Report).
@@ -38,65 +96,65 @@ Each member owns their feature area end-to-end (Tables, Models, Controllers, Rou
 School-Library-System/
 │
 ├── config/
-│   └── db.js                        # [Member A: @Dev-Hisayuki] Database connection
+│   └── db.js                        # [Member A: @jhormvybondad787-a11y] Database connection
 │
 ├── controllers/
-│   ├── authController.js            # [Member A: @Dev-Hisayuki] Admin login logic
-│   ├── categoryController.js        # [Member B: @MemberB-Dev] Book categories logic
-│   ├── bookController.js            # [Member B: @MemberB-Dev] Book catalog logic
-│   ├── borrowerController.js        # [Member C: @MemberC-Dev] Student/Borrower records
-│   ├── borrowController.js          # [Member C: @MemberC-Dev] Book checkout logic
-│   ├── returnController.js          # [Member D: @MemberD-Dev] Book check-in logic
-│   ├── inventoryLogController.js    # [Member D: @MemberD-Dev] Borrow & return logs
-│   └── fineController.js            # [Member D: @MemberD-Dev] Automated fine calculations
+│   ├── authController.js            # [Member A: @jhormvybondad787-a11y] Admin login logic
+│   ├── categoryController.js        # [Member B: @Dev-Hisayuki] Book categories logic
+│   ├── bookController.js            # [Member B: @Dev-Hisayuki] Book catalog logic
+│   ├── borrowerController.js        # [Member C: @Robren2005] Student/Borrower records
+│   ├── borrowController.js          # [Member C: @Robren2005] Book checkout logic
+│   ├── returnController.js          # [Member D: @kurtalvarado05-coder] Book check-in logic
+│   ├── inventoryLogController.js    # [Member D: @kurtalvarado05-coder] Borrow & return logs
+│   └── fineController.js            # [Member D: @kurtalvarado05-coder] Automated fine calculations
 │
 ├── models/
-│   ├── adminModel.js                # [Member A: @Dev-Hisayuki] Admin user model
-│   ├── categoryModel.js             # [Member B: @MemberB-Dev] Category database queries
-│   ├── bookModel.js                 # [Member B: @MemberB-Dev] Book database queries
-│   ├── borrowerModel.js             # [Member C: @MemberC-Dev] Borrower database queries
-│   ├── borrowTransactionModel.js    # [Member C: @MemberC-Dev] Borrow transaction queries
-│   ├── borrowDetailModel.js         # [Member C: @MemberC-Dev] Borrow details queries
-│   ├── returnTransactionModel.js    # [Member D: @MemberD-Dev] Return transaction queries
-│   ├── returnDetailModel.js         # [Member D: @MemberD-Dev] Return details queries
-│   ├── fineModel.js                 # [Member D: @MemberD-Dev] Fine tracking queries
-│   └── activityLogModel.js          # [Member A: @Dev-Hisayuki] System log queries
+│   ├── adminModel.js                # [Member A: @jhormvybondad787-a11y] Admin user model
+│   ├── categoryModel.js             # [Member B: @Dev-Hisayuki] Category database queries
+│   ├── bookModel.js                 # [Member B: @Dev-Hisayuki] Book database queries
+│   ├── borrowerModel.js             # [Member C: @Robren2005] Borrower database queries
+│   ├── borrowTransactionModel.js    # [Member C: @Robren2005] Borrow transaction queries
+│   ├── borrowDetailModel.js         # [Member C: @Robren2005] Borrow details queries
+│   ├── returnTransactionModel.js    # [Member D: @kurtalvarado05-coder] Return transaction queries
+│   ├── returnDetailModel.js         # [Member D: @kurtalvarado05-coder] Return details queries
+│   ├── fineModel.js                 # [Member D: @kurtalvarado05-coder] Fine tracking queries
+│   └── activityLogModel.js          # [Member A: @jhormvybondad787-a11y] System log queries
 │
 ├── routes/
-│   ├── authRoutes.js                # [Member A: @Dev-Hisayuki] Login routes
-│   ├── categoryRoutes.js            # [Member B: @MemberB-Dev] Category routes
-│   ├── bookRoutes.js                # [Member B: @MemberB-Dev] Book routes
-│   ├── borrowerRoutes.js            # [Member C: @MemberC-Dev] Borrower routes
-│   ├── borrowRoutes.js              # [Member C: @MemberC-Dev] Borrow transaction routes
-│   ├── returnRoutes.js              # [Member D: @MemberD-Dev] Return transaction routes
-│   ├── inventoryLogRoutes.js        # [Member D: @MemberD-Dev] System log routes
-│   └── fineRoutes.js                # [Member D: @MemberD-Dev] Fine alert routes
+│   ├── authRoutes.js                # [Member A: @jhormvybondad787-a11y] Login routes
+│   ├── categoryRoutes.js            # [Member B: @Dev-Hisayuki] Category routes
+│   ├── bookRoutes.js                # [Member B: @Dev-Hisayuki] Book routes
+│   ├── borrowerRoutes.js            # [Member C: @Robren2005] Borrower routes
+│   ├── borrowRoutes.js              # [Member C: @Robren2005] Borrow transaction routes
+│   ├── returnRoutes.js              # [Member D: @kurtalvarado05-coder] Return transaction routes
+│   ├── inventoryLogRoutes.js        # [Member D: @kurtalvarado05-coder] System log routes
+│   └── fineRoutes.js                # [Member D: @kurtalvarado05-coder] Fine alert routes
 │
-├── index.js                         # [Member A: @Dev-Hisayuki] Main server file
-├── package.json                     # [Member A: @Dev-Hisayuki] Packages and scripts
-└── .env                             # [Member A: @Dev-Hisayuki] Configuration settings
+├── index.js                         # [Member A: @jhormvybondad787-a11y] Main server file
+├── package.json                     # [Member A: @jhormvybondad787-a11y] Packages and scripts
+└── .env                             # [Member A: @jhormvybondad787-a11y] Configuration settings
 ```
 
 ---
 
 ## REST API Route Map
 
-### Member A: Auth & System
+### Member A: Auth & System (@jhormvybondad787-a11y)
 - `POST /api/auth/login` - Admin login
 
-### Member B: Books & Categories
+### Member B: Books & Categories (@Dev-Hisayuki)
 - `GET /api/categories` - Fetch categories
 - `POST /api/categories` - Add category
 - `GET /api/books` - Fetch all books
 - `POST /api/books` - Add a new book
 - `PUT /api/books/:id` - Update book details
 
-### Member C: Borrower & Checkout
+### Member C: Borrower & Checkout (@Robren2005)
 - `GET /api/borrowers` - Fetch student list
 - `POST /api/borrowers` - Register a new borrower
 - `POST /api/borrows` - Issue a book to a student
 
-### Member D: Returns, Logs & Fines
+### Member D: Returns, Logs & Fines (@kurtalvarado05-coder)
 - `POST /api/returns` - Process a book return
 - `GET /api/logs` - Fetch all system transaction logs
 - `GET /api/fines` - Fetch overdue books and calculated fines
@@ -109,6 +167,8 @@ School-Library-System/
 - **Member B (3 Tables):** `categories`, `books`, `publishers`
 - **Member C (3 Tables):** `borrowers`, `borrow_records`, `borrow_details`
 - **Member D (3 Tables):** `return_records`, `return_details`, `fines`
+
+---
 
 ## Git Rules for Group Members
 
