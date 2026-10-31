@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reservations & Penalties - Member 4</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f6f9; }
+    h1, h2 { color: #333; }
+    .card { background: white; padding: 15px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    th { background-color: #007bff; color: white; }
+    button { background: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #218838; }
+  </style>
+</head>
+<body>
+  <h1>School Library System — Reservations & Penalties Module</h1>
+
+  <div class="card">
+    <h2>Active Reservations</h2>
+    <button onclick="loadReservations()">Refresh Reservations</button>
+    <table id="reservationsTable">
+      <thead>
+        <tr><th>ID</th><th>User ID</th><th>Book ID</th><th>Date</th><th>Status</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Penalties & Overdue JOIN Report</h2>
+    <button onclick="loadReport()">Load Report</button>
+    <table id="reportTable">
+      <thead>
+        <tr><th>Penalty ID</th><th>Amount</th><th>Reason</th><th>Status</th><th>Reservation Date</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    async function loadReservations() {
+      const res = await fetch('/api/reservations');
+      const data = await res.json();
+      const tbody = document.querySelector('#reservationsTable tbody');
+      tbody.innerHTML = (data.data || []).map(r => `
+        <tr>
+          <td>${r.id}</td>
+          <td>${r.user_id || 'N/A'}</td>
+          <td>${r.book_id || 'N/A'}</td>
+          <td>${r.reservation_date || 'N/A'}</td>
+          <td>${r.status}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadReport() {
+      const res = await fetch('/api/penalties/report/overdue');
+      const data = await res.json();
+      const tbody = document.querySelector('#reportTable tbody');
+      tbody.innerHTML = (data.data || []).map(p => `
+        <tr>
+          <td>${p.penalty_id}</td>
+          <td>$${p.amount}</td>
+          <td>${p.reason}</td>
+          <td>${p.penalty_status}</td>
+          <td>${p.reservation_date || 'N/A'}</td>
+        </tr>
+      `).join('');
+    }
+
+    loadReservations();
+    loadReport();
+  </script>
+</body>
+</html>
+
