@@ -10,7 +10,6 @@ const penaltyRoutes = require('./routes/penaltyRoutes');
 const returnRoutes = require('./routes/returnRoutes');
 const inventoryLogRoutes = require('./routes/inventoryLogRoutes');
 const stockAlertRoutes = require('./routes/stockAlertRoutes');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -40,3 +39,5 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
+
+  
