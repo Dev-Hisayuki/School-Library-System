@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Library System - Activity Logs</title>
+    <link rel="stylesheet" href="../global.css">
+    <link rel="stylesheet" href="logs.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon"><i class="fa-solid fa-book-bookmark"></i></div>
+            <span class="brand-name">School Library System</span>
+            <span class="version-tag">v2.4</span>
+        </div>
+        <div class="user-profile-card">
+            <div class="avatar-wrapper"><div class="avatar-placeholder">AJ</div><span class="status-indicator"></span></div>
+            <div class="user-info"><div class="user-name">Allen Jay Alcorcon</div><div class="user-role">IT Student</div></div>
+        </div>
+        <nav class="nav-menu">
+            <a href="../dashboard/dashboard.html" class="nav-link"><i class="fa-solid fa-border-all"></i><span>Dashboard</span></a>
+            <a href="../check_out/checkout.html" class="nav-link"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>Check Out</span></a>
+            <a href="../check_in/checkin.html" class="nav-link"><i class="fa-solid fa-arrow-right-to-bracket"></i><span>Check In</span></a>
+            <a href="../logs/logs.html" class="nav-link active"><i class="fa-solid fa-clock-rotate-left"></i><span>Logs</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="dark-mode-toggle"><span>Dark Mode</span><button id="themeToggleBtn" class="toggle-switch">Toggle</button></div>
+            <button id="logoutBtn" class="logout-btn"><i class="fa-solid fa-power-off"></i> Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Search activity logs..."></div>
+            <div class="top-actions"><button class="btn-outline"><i class="fa-solid fa-download"></i> Export CSV</button></div>
+        </header>
+
+        <div class="view-container">
+            <div class="table-card">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>TIMESTAMP</th>
+                            <th>ACTION</th>
+                            <th>ITEM</th>
+                            <th>USER / BORROWER</th>
+                            <th>QTY</th>
+                            <th>DETAILS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="logs.js"></script>
+</body>
+</html>

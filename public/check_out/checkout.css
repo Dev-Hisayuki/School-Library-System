@@ -1,0 +1,9 @@
+.form-card-centered { max-width: 600px; margin: 0 auto; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; }
+.form-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
+.form-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+.form-icon.blue { background: #dbeafe; color: #2563eb; }
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.form-group label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); }
+.form-group input, .form-group select { padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-main); color: var(--text-primary); outline: none; }
+.btn-primary { background: var(--accent-blue); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; }
