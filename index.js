@@ -36,7 +36,7 @@ app.use('/api/logs', inventoryLogRoutes);
 app.use('/api/alerts', stockAlertRoutes);
 
 app.get('/', (req, res) => {
-  res.send('School Library System API - Active');
+  res.redirect('/login/login.html');
 });
 
 // Shortcut redirect for browser auto-fill

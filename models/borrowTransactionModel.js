@@ -1,15 +1,12 @@
-
 const db = require('../config/db');
 const borrowDetailModel = require('./borrowDetailModel');
 
-// Issue a book using a database transaction
-const createBorrowTransaction = async (studentId, bookId, dueDate) => {
+const createBorrowTransaction = async (studentId, itemId, dueDate) => {
     const connection = await db.getConnection();
 
     try {
         await connection.beginTransaction();
 
-        // Confirm that the student is registered as a borrower
         const [borrowers] = await connection.query(
             'SELECT borrower_id FROM borrowers WHERE student_id = ?',
             [studentId]
@@ -19,68 +16,61 @@ const createBorrowTransaction = async (studentId, bookId, dueDate) => {
             throw new Error('Student is not registered as a borrower');
         }
 
-        // Check and lock the book row
-        const [books] = await connection.query(
+        const [items] = await connection.query(
             `SELECT available_copies
-             FROM books
-             WHERE book_id = ?
+             FROM items
+             WHERE item_id = ?
              FOR UPDATE`,
-            [bookId]
+            [itemId]
         );
 
-        if (books.length === 0) {
-            throw new Error('Book not found');
+        if (items.length === 0) {
+            throw new Error('Item not found');
         }
 
-        if (books[0].available_copies <= 0) {
-            throw new Error('No available copies of this book');
+        if (items[0].available_copies <= 0) {
+            throw new Error('No available copies of this item');
         }
 
-        // Create the main borrowing record
         const [borrowResult] = await connection.query(
             `INSERT INTO borrow_records
-             (student_id, book_id, borrow_date, due_date, status)
+             (student_id, item_id, borrow_date, due_date, status)
              VALUES (?, ?, CURDATE(), ?, 'Borrowed')`,
-            [studentId, bookId, dueDate]
+            [studentId, itemId, dueDate]
         );
 
-        // Create the borrowing detail
         await borrowDetailModel.createBorrowDetail(
             connection,
             borrowResult.insertId,
-            bookId
+            itemId
         );
 
-        // Decrease available book copies
         await connection.query(
-            `UPDATE books
+            `UPDATE items
              SET available_copies = available_copies - 1
-             WHERE book_id = ?`,
-            [bookId]
+             WHERE item_id = ?`,
+            [itemId]
         );
 
         await connection.commit();
-
         return borrowResult.insertId;
 
     } catch (error) {
         await connection.rollback();
         throw error;
-
     } finally {
         connection.release();
     }
 };
 
-// Get one borrowing record with student and book information
 const getBorrowDetails = async (borrowId) => {
     const [rows] = await db.query(
         `SELECT
             br.borrow_id,
             br.student_id,
             s.student_name,
-            br.book_id,
-            b.book_title,
+            br.item_id,
+            i.item_name,
             br.borrow_date,
             br.due_date,
             br.return_date,
@@ -88,16 +78,16 @@ const getBorrowDetails = async (borrowId) => {
          FROM borrow_records br
          INNER JOIN students s
             ON br.student_id = s.student_id
-         INNER JOIN books b
-            ON br.book_id = b.book_id
+         INNER JOIN items i
+            ON br.item_id = i.item_id
          WHERE br.borrow_id = ?`,
         [borrowId]
     );
 
     return rows[0] || null;
 };
+
 module.exports = {
     createBorrowTransaction,
     getBorrowDetails
 };
-

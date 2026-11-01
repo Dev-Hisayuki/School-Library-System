@@ -36,14 +36,11 @@ class PenaltyModel {
         p.amount,
         p.reason,
         p.status AS penalty_status,
-        r.id AS reservation_id,
+        r.reservation_id,
         r.reservation_date,
-        r.status AS reservation_status,
-        bp.max_books_allowed,
-        bp.fine_per_day
+        r.status AS reservation_status
       FROM penalties p
-      LEFT JOIN reservations r ON p.borrow_id = r.id
-      LEFT JOIN borrowing_policies bp ON bp.id = 1
+      LEFT JOIN reservations r ON p.borrow_id = r.reservation_id
     `;
     const [rows] = await db.query(query);
     return rows;
