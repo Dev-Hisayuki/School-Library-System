@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -41,3 +42,7 @@ app.listen(PORT, () => {
 
 
   
+=======
+const routesD_policyReservation = require('./app/routes/routesD_policyReservation');
+app.use('/api/policy-reservations', routesD_policyReservation);
+>>>>>>> main
