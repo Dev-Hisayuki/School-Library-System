@@ -5,7 +5,7 @@ require('dotenv').config();
 // Existing routes on main
 const reservationRoutes = require('./routes/reservationRoutes');
 const penaltyRoutes = require('./routes/penaltyRoutes');
-const routesID_policyReservation = require('./app/routes/routesID_policyReservation');
+const routesID_policyReservation = require('./app/routes/routesD_policyReservation');
 
 // Feature & Member D routes
 const returnRoutes = require('./routes/returnRoutes');
@@ -13,6 +13,8 @@ const inventoryLogRoutes = require('./routes/inventoryLogRoutes');
 const stockAlertRoutes = require('./routes/stockAlertRoutes');
 const bookRoutes = require('./routes/bookRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
+const borrowerRoutes = require('./routes/borrowerRoutes');
+const borrowRoutes = require('./routes/borrowRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,6 +29,8 @@ app.use('/api/penalties', penaltyRoutes);
 app.use('/api/policy-reservations', routesID_policyReservation);
 app.use('/api/books', bookRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/borrowers', borrowerRoutes);
+app.use('/api/borrows', borrowRoutes);
 app.use('/api/returns', returnRoutes);
 app.use('/api/logs', inventoryLogRoutes);
 app.use('/api/alerts', stockAlertRoutes);

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issue Book | School Library</title>
+
+    <link rel="stylesheet" href="../global.css">
+    <link rel="stylesheet" href="issue.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="brand">
+            <i class="fas fa-book-open"></i>
+            <span>School Library</span>
+        </div>
+
+        <div class="profile-card">
+            <i class="fas fa-user-circle"></i>
+            <span>Library Staff</span>
+        </div>
+
+        <nav>
+            <a href="../dashboard/dashboard.html">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </a>
+
+            <a href="../borrowers/borrowers.html">
+                <i class="fas fa-users"></i> Borrowers
+            </a>
+
+            <a href="issue.html" class="active">
+                <i class="fas fa-book"></i> Issue Book
+            </a>
+
+            <a href="../check_in/checkin.html">
+                <i class="fas fa-undo"></i> Check In
+            </a>
+
+            <a href="../logs/logs.html">
+                <i class="fas fa-history"></i> Logs
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <button id="themeToggleBtn">
+                <i class="fas fa-moon"></i> Dark Mode
+            </button>
+
+            <button id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <h2>Issue Book</h2>
+        </header>
+
+        <section class="page-heading">
+            <div>
+                <h1>Issue a Book</h1>
+                <p>Record a book borrowing transaction for a registered student.</p>
+            </div>
+        </section>
+
+        <div id="messageBox" class="message-box" hidden></div>
+
+        <section class="form-card">
+
+            <div class="form-header">
+                <div class="form-icon">
+                    <i class="fas fa-book-reader"></i>
+                </div>
+
+                <div>
+                    <h2>Borrowing Information</h2>
+                    <p>Complete the details below to issue a book.</p>
+                </div>
+            </div>
+
+            <form id="issueForm">
+
+                <div class="form-group">
+                    <label for="studentSelect">Registered Student</label>
+                    <select id="studentSelect" required>
+                        <option value="">Loading students...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="bookSelect">Select Book</label>
+                    <select id="bookSelect" required>
+                        <option value="">Loading books...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="dueDate">Due Date</label>
+                    <input type="date" id="dueDate" required>
+                </div>
+
+                <button type="submit" id="issueBtn" class="btn-primary">
+                    <i class="fas fa-check-circle"></i>
+                    Issue Book
+                </button>
+
+            </form>
+        </section>
+
+    </main>
+
+    <script src="issue.js"></script>
+</body>
+</html>

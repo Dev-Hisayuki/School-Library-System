@@ -4,35 +4,32 @@ class BookModel {
   // Get all books with category and publisher details (LEFT JOIN Report)
   static async getAllBooks() {
     const query = `
-      SELECT 
-        b.book_id,
-        b.title,
-        b.isbn,
-        b.publication_year,
-        b.available_copies,
-        c.category_name,
-        p.publisher_name
-      FROM books b
-      LEFT JOIN categories c ON b.category_id = c.category_id
-      LEFT JOIN publishers p ON b.publisher_id = p.publisher_id
-      ORDER BY b.title ASC
+        SELECT
+            book_id,
+            book_title,
+            total_copies,
+            available_copies
+        FROM books
+        ORDER BY book_title ASC
     `;
     const [rows] = await db.query(query);
     return rows;
-  }
+}
 
   // Get single book by ID
   static async getBookById(id) {
     const query = `
-      SELECT b.*, c.category_name, p.publisher_name 
-      FROM books b
-      LEFT JOIN categories c ON b.category_id = c.category_id
-      LEFT JOIN publishers p ON b.publisher_id = p.publisher_id
-      WHERE b.book_id = ?
+        SELECT
+            book_id,
+            book_title,
+            total_copies,
+            available_copies
+        FROM books
+        WHERE book_id = ?
     `;
     const [rows] = await db.query(query, [id]);
     return rows[0];
-  }
+}
 
   // Create new book entry
   static async createBook(data) {

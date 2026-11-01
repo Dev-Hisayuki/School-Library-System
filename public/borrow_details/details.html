@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borrow Details | School Library</title>
+
+    <link rel="stylesheet" href="../global.css">
+    <link rel="stylesheet" href="details.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="brand">
+            <i class="fas fa-book-open"></i>
+            <span>School Library</span>
+        </div>
+
+        <div class="profile-card">
+            <i class="fas fa-user-circle"></i>
+            <span>Library Staff</span>
+        </div>
+
+        <nav>
+            <a href="../dashboard/dashboard.html">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </a>
+
+            <a href="../borrowers/borrowers.html">
+                <i class="fas fa-users"></i> Borrowers
+            </a>
+
+            <a href="../issue_book/issue.html">
+                <i class="fas fa-book"></i> Issue Book
+            </a>
+
+            <a href="../check_in/checkin.html">
+                <i class="fas fa-undo"></i> Check In
+            </a>
+
+            <a href="../logs/logs.html">
+                <i class="fas fa-history"></i> Logs
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <button id="themeToggleBtn">
+                <i class="fas fa-moon"></i> Dark Mode
+            </button>
+
+            <button id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <h2>Borrow Details</h2>
+        </header>
+
+        <section class="page-heading">
+            <div>
+                <h1>Borrow Details</h1>
+                <p>Search and view a library borrowing transaction.</p>
+            </div>
+        </section>
+
+        <section class="search-card">
+            <form id="searchForm">
+                <div class="form-group">
+                    <label for="borrowId">Borrow ID</label>
+                    <input
+                        type="number"
+                        id="borrowId"
+                        min="1"
+                        placeholder="Enter Borrow ID"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn-primary" id="searchBtn">
+                    <i class="fas fa-search"></i> Search Borrow
+                </button>
+            </form>
+        </section>
+
+        <div id="messageBox" class="message-box" hidden></div>
+
+        <section id="detailsCard" class="details-card" hidden>
+
+            <div class="details-header">
+                <div>
+                    <h2>Transaction Information</h2>
+                    <p id="borrowNumber"></p>
+                </div>
+
+                <span id="statusBadge" class="status-badge"></span>
+            </div>
+
+            <div class="details-grid">
+
+                <div class="detail-item">
+                    <label>Student Name</label>
+                    <p id="studentName"></p>
+                </div>
+
+                <div class="detail-item">
+                    <label>Student ID</label>
+                    <p id="studentId"></p>
+                </div>
+
+                <div class="detail-item">
+                    <label>Book Title</label>
+                    <p id="bookTitle"></p>
+                </div>
+
+                <div class="detail-item">
+                    <label>Book ID</label>
+                    <p id="bookId"></p>
+                </div>
+
+                <div class="detail-item">
+                    <label>Borrow Date</label>
+                    <p id="borrowDate"></p>
+                </div>
+
+                <div class="detail-item">
+                    <label>Due Date</label>
+                    <p id="dueDate"></p>
+                </div>
+
+                <div class="detail-item">
+                    <label>Return Date</label>
+                    <p id="returnDate"></p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <script src="details.js"></script>
+</body>
+</html>
