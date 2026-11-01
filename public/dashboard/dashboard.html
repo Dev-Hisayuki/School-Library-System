@@ -35,6 +35,9 @@
     <main class="main-content">
         <header class="top-bar">
             <div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Search books, catalog, borrowers..."></div>
+            <div class="top-actions">
+                <button class="btn-primary" id="openAddItemBtn"><i class="fa-solid fa-plus"></i> Add Item</button>
+            </div>
         </header>
 
         <div class="view-container">
@@ -44,7 +47,8 @@
                     <p>Here is the current operational status for school assets & library items.</p>
                 </div>
                 <div class="banner-actions">
-                    <a href="../check_out/checkout.html" class="btn-secondary-light">Quick Check Out</a>
+                    <button class="btn-secondary-light" id="openAddItemBannerBtn"><i class="fa-solid fa-plus"></i> Add New Item</button>
+                    <a href="../check_out/checkout.html" class="btn-light">Quick Check Out</a>
                 </div>
             </div>
 
@@ -53,7 +57,7 @@
                     <div>
                         <span class="kpi-label">TOTAL ITEMS</span>
                         <div class="kpi-value" id="kpiTotal">94</div>
-                        <span class="kpi-sub positive">+12 added this term</span>
+                        <span class="kpi-sub positive" id="kpiAddedSub">+12 added this term</span>
                     </div>
                     <div class="kpi-icon blue"><i class="fa-solid fa-box"></i></div>
                 </div>
@@ -101,6 +105,40 @@
             </div>
         </div>
     </main>
+
+    <!-- ADD ITEM MODAL -->
+    <div id="addItemModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-plus-circle"></i> Add New Inventory Item</h3>
+                <button id="closeAddItemBtn" class="close-btn">&times;</button>
+            </div>
+            <form id="addItemForm">
+                <div class="form-group">
+                    <label>ITEM NAME</label>
+                    <input type="text" id="itemname" placeholder="e.g. Modern Database Systems 5th Ed" required>
+                </div>
+                <div class="form-group">
+                    <label>ITEM CATEGORY</label>
+                    <select id="itemcategory" required>
+                        <option value="Science & Lab">Science & Lab</option>
+                        <option value="IT & Electronics">IT & Electronics</option>
+                        <option value="Sports & Athletics">Sports & Athletics</option>
+                        <option value="Classroom Supplies">Classroom Supplies</option>
+                        <option value="Audio/Visual">Audio/Visual</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>ITEM QUANTITY</label>
+                    <input type="number" id="itemquantity" min="1" value="1" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="cancelAddItemBtn" class="btn-outline">Cancel</button>
+                    <button type="submit" class="btn-primary">Save to Catalog</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script src="dashboard.js"></script>
 </body>
