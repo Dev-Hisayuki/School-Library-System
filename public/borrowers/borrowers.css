@@ -1,0 +1,161 @@
+.page-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.page-heading h1 {
+    font-size: 1.6rem;
+    margin-bottom: 5px;
+}
+
+.page-heading p,
+.table-heading p,
+.form-card p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: var(--accent-blue);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--accent-blue-hover);
+}
+
+.btn-secondary {
+    background: var(--bg-main);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.form-card,
+.table-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.form-card h2,
+.table-heading h2 {
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+}
+
+.form-card form {
+    margin-top: 20px;
+    max-width: 400px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.form-group input {
+    padding: 11px;
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+    background: var(--bg-main);
+    color: var(--text-primary);
+}
+
+.table-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th,
+td {
+    padding: 14px;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.9rem;
+}
+
+th {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.message-box {
+    display: none;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+}
+
+.message-box.success {
+    display: block;
+    background: #dcfce7;
+    color: #166534;
+}
+
+.message-box.error {
+    display: block;
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 700px) {
+    body {
+        overflow: auto;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .sidebar {
+        width: 190px;
+        padding: 12px;
+    }
+
+    .page-heading,
+    .table-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .view-container {
+        padding: 18px;
+    }
+}
