@@ -29,7 +29,6 @@ class PenaltyModel {
     return result.affectedRows;
   }
 
-  // Required JOIN Report for Member 4
   static async getOverduePenaltiesReport() {
     const query = `
       SELECT 

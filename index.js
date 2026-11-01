@@ -1,13 +1,16 @@
+<<<<<<< HEAD
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
+// Existing routes on main
 const reservationRoutes = require('./routes/reservationRoutes');
 const penaltyRoutes = require('./routes/penaltyRoutes');
-// 1. Require your book and category routes
-const bookRoutes = require('./routes/bookRoutes');
-const categoryRoutes = require('./routes/categoryRoutes');
 
+// Member D (Kurt Alvarado) routes
+const returnRoutes = require('./routes/returnRoutes');
+const inventoryLogRoutes = require('./routes/inventoryLogRoutes');
+const stockAlertRoutes = require('./routes/stockAlertRoutes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -15,17 +18,31 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// Register your assigned routes
+// Register routes
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/penalties', penaltyRoutes);
-// 2. Mount your book and category routes
-app.use('/api/books', bookRoutes);
-app.use('/api/categories', categoryRoutes);
+
+// Member D routes
+app.use('/api/returns', returnRoutes);
+app.use('/api/logs', inventoryLogRoutes);
+app.use('/api/alerts', stockAlertRoutes);
 
 app.get('/', (req, res) => {
-  res.send('School Library System API - Member B Catalog Slice Active');
+  res.send('School Library System API - Member D Slice Active');
+});
+
+// Shortcut redirect for browser auto-fill
+app.get('/reservation', (req, res) => {
+  res.redirect('/reservations.html');
 });
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+
+  
+=======
+const routesD_policyReservation = require('./app/routes/routesD_policyReservation');
+app.use('/api/policy-reservations', routesD_policyReservation);
+>>>>>>> main
