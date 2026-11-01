@@ -17,6 +17,8 @@ This project is more than a simple database program because of its automated bus
 1. Daily Overdue Fine Calculation: The system checks return due dates automatically. If a book is late, it calculates fines based on days overdue.
 2. Automatic Student Blocking: If a student has overdue books or unpaid fines above the allowed limit, the system blocks them from borrowing new books until the issue is cleared.
 
+
+
 ---
 
 ## System Architecture
@@ -94,46 +96,73 @@ Each member owns their feature area end-to-end (Tables, Models, Controllers, Rou
 
 ```text
 School-Library-System/
-│
 ├── config/
-│   └── db.js                        # [Member A: @jhormvybondad787-a11y] Database connection
+│   └── db.js                        # Database connection configuration
 │
 ├── controllers/
-│   ├── authController.js            # [Member A: @jhormvybondad787-a11y] Admin login logic
-│   ├── categoryController.js        # [Member B: @Dev-Hisayuki] Book categories logic
-│   ├── bookController.js            # [Member B: @Dev-Hisayuki] Book catalog logic
-│   ├── borrowerController.js        # [Member C: @Robren2005] Student/Borrower records
-│   ├── borrowController.js          # [Member C: @Robren2005] Book checkout logic
-│   ├── returnController.js          # [Member D: @kurtalvarado05-coder] Book check-in logic
-│   ├── inventoryLogController.js    # [Member D: @kurtalvarado05-coder] Borrow & return logs
-│   └── fineController.js            # [Member D: @kurtalvarado05-coder] Automated fine calculations
+│   ├── authController.js            # Admin login & authentication logic
+│   ├── bookController.js            # Book catalog logic
+│   ├── categoryController.js        # Book categories logic
+│   ├── borrowerController.js        # Student/Borrower records
+│   ├── borrowController.js          # Book checkout logic
+│   ├── returnController.js          # Book check-in logic
+│   ├── inventoryLogController.js    # Borrow & return logs
+│   ├── fineController.js            # Automated fine calculations
+│   └── reservationController.js     # Book reservation logic
 │
 ├── models/
-│   ├── adminModel.js                # [Member A: @jhormvybondad787-a11y] Admin user model
-│   ├── categoryModel.js             # [Member B: @Dev-Hisayuki] Category database queries
-│   ├── bookModel.js                 # [Member B: @Dev-Hisayuki] Book database queries
-│   ├── borrowerModel.js             # [Member C: @Robren2005] Borrower database queries
-│   ├── borrowTransactionModel.js    # [Member C: @Robren2005] Borrow transaction queries
-│   ├── borrowDetailModel.js         # [Member C: @Robren2005] Borrow details queries
-│   ├── returnTransactionModel.js    # [Member D: @kurtalvarado05-coder] Return transaction queries
-│   ├── returnDetailModel.js         # [Member D: @kurtalvarado05-coder] Return details queries
-│   ├── fineModel.js                 # [Member D: @kurtalvarado05-coder] Fine tracking queries
-│   └── activityLogModel.js          # [Member A: @jhormvybondad787-a11y] System log queries
+│   ├── adminModel.js                # Admin user database queries
+│   ├── bookModel.js                 # Book database queries
+│   ├── categoryModel.js             # Category database queries
+│   ├── borrowerModel.js             # Borrower database queries
+│   ├── borrowTransactionModel.js    # Borrow transaction queries
+│   ├── borrowDetailModel.js         # Borrow details queries
+│   ├── returnTransactionModel.js    # Return transaction queries
+│   ├── returnDetailModel.js         # Return details queries
+│   ├── penaltyModel.js              # Penalty / fine tracking queries
+│   ├── activityLogModel.js          # System log queries
+│   └── reservationModel.js          # Reservation queries
+│
+├── public/
+│   ├── global.css                   # Shared base styles & theme variables
+│   ├── check_in/
+│   │   ├── checkin.css
+│   │   ├── checkin.html
+│   │   └── checkin.js
+│   ├── check_out/
+│   │   ├── checkout.css
+│   │   ├── checkout.html
+│   │   └── checkout.js
+│   ├── dashboard/
+│   │   ├── dashboard.css
+│   │   ├── dashboard.html
+│   │   └── dashboard.js             # Includes Add Item modal handler (itemname, itemcategory, itemquantity)
+│   ├── login/
+│   │   ├── login.css
+│   │   ├── login.html
+│   │   └── login.js
+│   └── logs/
+│       ├── logs.css
+│       ├── logs.html
+│       └── logs.js
 │
 ├── routes/
-│   ├── authRoutes.js                # [Member A: @jhormvybondad787-a11y] Login routes
-│   ├── categoryRoutes.js            # [Member B: @Dev-Hisayuki] Category routes
-│   ├── bookRoutes.js                # [Member B: @Dev-Hisayuki] Book routes
-│   ├── borrowerRoutes.js            # [Member C: @Robren2005] Borrower routes
-│   ├── borrowRoutes.js              # [Member C: @Robren2005] Borrow transaction routes
-│   ├── returnRoutes.js              # [Member D: @kurtalvarado05-coder] Return transaction routes
-│   ├── inventoryLogRoutes.js        # [Member D: @kurtalvarado05-coder] System log routes
-│   └── fineRoutes.js                # [Member D: @kurtalvarado05-coder] Fine alert routes
+│   ├── authRoutes.js                # Login routes
+│   ├── bookRoutes.js                # Book catalog routes
+│   ├── categoryRoutes.js            # Category routes
+│   ├── borrowerRoutes.js            # Borrower routes
+│   ├── borrowRoutes.js              # Borrow transaction routes
+│   ├── returnRoutes.js              # Return transaction routes
+│   ├── inventoryLogRoutes.js        # System log routes
+│   ├── penaltyRoutes.js             # Fine alert routes
+│   └── reservationRoutes.js         # Reservation routes
 │
-├── index.js                         # [Member A: @jhormvybondad787-a11y] Main server file
-├── package.json                     # [Member A: @jhormvybondad787-a11y] Packages and scripts
-└── .env                             # [Member A: @jhormvybondad787-a11y] Configuration settings
-```
+├── .env                             # Environment configuration settings
+├── .gitignore
+├── index.js                         # Main server entry point
+├── package.json                     # Project packages and scripts
+├── package-lock.json
+└── README.md
 
 ---
 
