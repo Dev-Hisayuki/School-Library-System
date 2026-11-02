@@ -1,4 +1,4 @@
-const db = require('../config/db'); // Assumes a shared database connection pool
+const db = require('../config/db');
 
 class ReservationModel {
     // --- RESERVATIONS CRUD ---
@@ -38,17 +38,17 @@ class ReservationModel {
     // --- REQUIRED JOIN REPORT: Overdue and Penalty Report (FULL OUTER JOIN via UNION) ---
     static async getOverdueAndPenaltyReport() {
         const query = `
-            SELECT r.reservation_id, s.student_id, s.first_name, s.last_name, r.status, p.fine_amount, p.payment_status
+            SELECT r.reservation_id, s.student_id, s.student_name, r.status, p.amount AS fine_amount, p.status AS payment_status
             FROM reservations r
             LEFT JOIN students s ON r.student_id = s.student_id
-            LEFT JOIN penalties p ON r.reservation_id = p.reservation_id
+            LEFT JOIN penalties p ON r.reservation_id = p.borrow_id
             
             UNION
             
-            SELECT r.reservation_id, s.student_id, s.first_name, s.last_name, r.status, p.fine_amount, p.payment_status
+            SELECT r.reservation_id, s.student_id, s.student_name, r.status, p.amount AS fine_amount, p.status AS payment_status
             FROM reservations r
             RIGHT JOIN students s ON r.student_id = s.student_id
-            RIGHT JOIN penalties p ON r.reservation_id = p.reservation_id;
+            RIGHT JOIN penalties p ON r.reservation_id = p.borrow_id;
         `;
         const [rows] = await db.query(query);
         return rows;

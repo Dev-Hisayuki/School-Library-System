@@ -3,6 +3,7 @@ const borrowDetailModel = require('./borrowDetailModel');
 
 // Issue a book using a database transaction
 const createBorrowTransaction = async (studentId, bookId) => {
+const createBorrowTransaction = async (studentId, itemId, dueDate) => {
     const connection = await db.getConnection();
 
     try {
@@ -107,12 +108,16 @@ const createBorrowTransaction = async (studentId, bookId) => {
             `SELECT book_id, title, available_copies
              FROM books
              WHERE book_id = ?
+        const [items] = await connection.query(
+            `SELECT available_copies
+             FROM items
+             WHERE item_id = ?
              FOR UPDATE`,
-            [bookId]
+            [itemId]
         );
 
-        if (books.length === 0) {
-            throw new Error('Book not found');
+        if (items.length === 0) {
+            throw new Error('Item not found');
         }
 
         if (Number(books[0].available_copies) <= 0) {
@@ -129,21 +134,28 @@ const createBorrowTransaction = async (studentId, bookId) => {
         const [borrowResult] = await connection.query(
             `INSERT INTO borrow_records
                 (student_id, book_id, borrow_date, due_date, status)
+        if (items[0].available_copies <= 0) {
+            throw new Error('No available copies of this item');
+        }
+
+        const [borrowResult] = await connection.query(
+            `INSERT INTO borrow_records
+             (student_id, item_id, borrow_date, due_date, status)
              VALUES (?, ?, CURDATE(), ?, 'Borrowed')`,
-            [studentId, bookId, dueDate]
+            [studentId, itemId, dueDate]
         );
 
         await borrowDetailModel.createBorrowDetail(
             connection,
             borrowResult.insertId,
-            bookId
+            itemId
         );
 
         await connection.query(
-            `UPDATE books
+            `UPDATE items
              SET available_copies = available_copies - 1
-             WHERE book_id = ?`,
-            [bookId]
+             WHERE item_id = ?`,
+            [itemId]
         );
 
         await connection.query(
@@ -163,11 +175,11 @@ const createBorrowTransaction = async (studentId, bookId) => {
             borrow_id: borrowResult.insertId,
             due_date: dueDate
         };
+        return borrowResult.insertId;
 
     } catch (error) {
         await connection.rollback();
         throw error;
-
     } finally {
         connection.release();
     }
@@ -216,6 +228,8 @@ const getBorrowDetails = async (borrowId) => {
             s.student_name,
             br.book_id,
             b.title AS book_title,
+            br.item_id,
+            i.item_name,
             br.borrow_date,
             br.due_date,
             br.return_date,
@@ -225,6 +239,8 @@ const getBorrowDetails = async (borrowId) => {
             ON br.student_id = s.student_id
          INNER JOIN books AS b
             ON br.book_id = b.book_id
+         INNER JOIN items i
+            ON br.item_id = i.item_id
          WHERE br.borrow_id = ?`,
         [borrowId]
     );

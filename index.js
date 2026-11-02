@@ -123,6 +123,7 @@ app.use('/api/alerts', stockAlertRoutes);
 // ==========================================
 app.get('/', (req, res) => {
     res.send('School Library System API - Active');
+  res.redirect('/login/login.html');
 });
 
 app.get('/reservation', (req, res) => {
