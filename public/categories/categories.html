@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories | Library Management System</title>
+
+    <link rel="stylesheet" href="../global.css">
+    <link rel="stylesheet" href="categories.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <script src="categories.js" defer></script>
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="sidebar-brand">
+                <i class="fa-solid fa-book-bookmark"></i>
+                <span>Library System</span>
+            </div>
+
+            <nav class="sidebar-nav">
+
+                <a href="../dashboard/dashboard.html" class="nav-link">
+                    <i class="fa-solid fa-border-all"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="../students/students.html" class="nav-link">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <span>Students</span>
+                </a>
+
+                <a href="../borrowers/borrowers.html" class="nav-link">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Borrowers</span>
+                </a>
+
+                <a href="../books/books.html" class="nav-link">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>Books</span>
+                </a>
+
+                <a href="../categories/categories.html" class="nav-link active">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>Categories</span>
+                </a>
+
+                <a href="../publishers/publishers.html" class="nav-link">
+                    <i class="fa-solid fa-building"></i>
+                    <span>Publishers</span>
+                </a>
+
+                <a href="../issue_book/issue.html" class="nav-link">
+                    <i class="fa-solid fa-book"></i>
+                    <span>Issue Book</span>
+                </a>
+
+                <a href="../check_out/checkout.html" class="nav-link">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Check Out</span>
+                </a>
+
+                <a href="../check_in/checkin.html" class="nav-link">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <span>Check In</span>
+                </a>
+
+                <a href="../logs/logs.html" class="nav-link">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>Activity Logs</span>
+                </a>
+
+                <a href="../settings/settings.html" class="nav-link">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span>
+                </a>
+
+            </nav>
+
+            <div class="sidebar-footer">
+
+                <div class="dark-mode-toggle">
+                    <span>Dark Mode</span>
+                    <button
+                        id="themeToggleBtn"
+                        class="toggle-switch"
+                        type="button"
+                        aria-pressed="false">
+                        Off
+                    </button>
+                </div>
+
+                <button id="logoutBtn" class="logout-btn" type="button">
+                    <i class="fa-solid fa-power-off"></i>
+                    <span>Logout</span>
+                </button>
+
+            </div>
+
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <!-- TOPBAR -->
+            <header class="top-bar">
+
+                <div>
+                    <h2>Categories</h2>
+                    <p>Manage your library's book categories</p>
+                </div>
+
+                <div class="top-actions">
+
+                    <div class="admin-profile">
+
+                        <div class="admin-avatar">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+
+                        <div class="admin-info">
+                            <span class="admin-name">Administrator</span>
+                            <span class="admin-role">System Admin</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+            <!-- PAGE CONTENT -->
+            <section class="view-container category-page">
+
+                <div class="page-heading">
+
+                    <div>
+                        <h1>Category Management</h1>
+                        <p>Manage and organize your library's book categories.</p>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn-primary"
+                        id="addCategoryBtn">
+                        <i class="fa-solid fa-plus"></i>
+                        Add Category
+                    </button>
+
+                </div>
+
+                <!-- STATISTICS -->
+                <div class="category-stats">
+
+                    <div class="category-stat-card">
+                        <div class="category-stat-info">
+                            <span class="category-stat-label">
+                                Total Categories
+                            </span>
+                            <h2 id="totalCategories">0</h2>
+                        </div>
+
+                        <div class="category-stat-icon blue">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </div>
+                    </div>
+
+                    <div class="category-stat-card">
+                        <div class="category-stat-info">
+                            <span class="category-stat-label">
+                                Categorized Books
+                            </span>
+                            <h2 id="categorizedBooks">0</h2>
+                        </div>
+
+                        <div class="category-stat-icon green">
+                            <i class="fa-solid fa-book-open"></i>
+                        </div>
+                    </div>
+
+                    <div class="category-stat-card">
+                        <div class="category-stat-info">
+                            <span class="category-stat-label">
+                                Empty Categories
+                            </span>
+                            <h2 id="emptyCategories">0</h2>
+                        </div>
+
+                        <div class="category-stat-icon orange">
+                            <i class="fa-solid fa-folder-open"></i>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- CATEGORY TABLE -->
+                <div class="widget table-card">
+
+                    <div class="widget-header">
+
+                        <div>
+                            <h2>Category Records</h2>
+                            <p>View and manage registered book categories.</p>
+                        </div>
+
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+
+                            <input
+                                type="search"
+                                id="categorySearch"
+                                placeholder="Search categories..."
+                                autocomplete="off">
+                        </div>
+
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Category Name</th>
+                                    <th>Description</th>
+                                    <th>Total Books</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="categoriesTableBody">
+                                <tr>
+                                    <td colspan="4" class="table-message">
+                                        Loading categories...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                    <div class="table-footer">
+                        <span id="categoryCount">0 categories found</span>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- ADD / EDIT CATEGORY MODAL -->
+    <div class="modal-overlay" id="categoryModal">
+
+        <div class="modal-card" role="dialog" aria-modal="true"
+             aria-labelledby="categoryModalTitle">
+
+            <div class="modal-header">
+
+                <div>
+                    <h2 id="categoryModalTitle">Add New Category</h2>
+                    <p>Enter the category information below.</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="close-btn"
+                    id="closeCategoryModalBtn"
+                    aria-label="Close modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+            </div>
+
+            <form id="categoryForm">
+
+                <input type="hidden" id="categoryId">
+
+                <div class="form-group">
+                    <label for="categoryName">Category Name</label>
+
+                    <input
+                        type="text"
+                        id="categoryName"
+                        placeholder="Enter category name"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="categoryDescription">Description</label>
+
+                    <textarea
+                        id="categoryDescription"
+                        rows="3"
+                        placeholder="Enter category description"></textarea>
+                </div>
+
+                <div class="form-actions">
+
+                    <button
+                        type="button"
+                        class="btn-secondary"
+                        id="cancelCategoryBtn">
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn-primary"
+                        id="saveCategoryBtn">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Save Category
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- MODAL NOTIFICATION -->
+    <div
+        class="message-box"
+        id="categoryMessage"
+        role="alert"
+        aria-live="polite">
+    </div>
+
+    <!-- PAGE NOTIFICATION -->
+    <div
+        class="message-box"
+        id="pageMessage"
+        role="alert"
+        aria-live="polite">
+    </div>
+
+</body>
+</html>

@@ -1,4 +1,3 @@
-
 const borrowerModel = require('../models/borrowerModel');
 
 // GET /api/borrowers
@@ -69,4 +68,3 @@ module.exports = {
     getAllBorrowers,
     createBorrower
 };
-

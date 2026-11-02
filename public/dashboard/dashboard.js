@@ -1,99 +1,315 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Theme & Logout Controls
-    const isDarkMode = localStorage.getItem('theme') === 'dark';
-    if (isDarkMode) document.body.classList.add('dark-mode');
 
-    document.getElementById('themeToggleBtn').addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+document.addEventListener('DOMContentLoaded', () => {
+    const API_URL = '/api/dashboard';
+
+    const colors = [
+        '#2563eb',
+        '#3b82f6',
+        '#10b981',
+        '#f59e0b',
+        '#8b5cf6',
+        '#ec4899',
+        '#06b6d4'
+    ];
+
+    function getElement(id) {
+        return document.getElementById(id);
+    }
+
+    function setText(id, value) {
+        const element = getElement(id);
+
+        if (element) {
+            element.textContent = value ?? 0;
+        }
+    }
+
+    function escapeHTML(value) {
+        return String(value ?? '').replace(/[&<>"']/g, character => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        })[character]);
+    }
+
+    function formatDate(dateValue) {
+        if (!dateValue) return 'Unknown date';
+
+        const date = new Date(dateValue);
+
+        if (Number.isNaN(date.getTime())) {
+            return String(dateValue);
+        }
+
+        return date.toLocaleString([], {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    // ==========================================
+    // DARK MODE
+    // ==========================================
+
+    const themeToggleBtn = getElement('themeToggleBtn');
+
+    function applyTheme() {
+        const isDarkMode = localStorage.getItem('theme') === 'dark';
+
+        document.body.classList.toggle('dark-mode', isDarkMode);
+
+        if (themeToggleBtn) {
+            themeToggleBtn.textContent = isDarkMode ? 'On' : 'Off';
+            themeToggleBtn.setAttribute(
+                'aria-pressed',
+                String(isDarkMode)
+            );
+        }
+    }
+
+    applyTheme();
+
+    themeToggleBtn?.addEventListener('click', () => {
+        const isDarkMode = document.body.classList.contains('dark-mode');
+
+        localStorage.setItem(
+            'theme',
+            isDarkMode ? 'light' : 'dark'
+        );
+
+        applyTheme();
     });
 
-    document.getElementById('logoutBtn').addEventListener('click', () => {
+    // ==========================================
+    // LOGOUT
+    // ==========================================
+
+    getElement('logoutBtn')?.addEventListener('click', () => {
         localStorage.removeItem('authToken');
+        localStorage.removeItem('admin');
+        sessionStorage.clear();
+
         window.location.href = '../login/login.html';
     });
 
-    // Dashboard Data State
-    let totalStockCount = 94;
-    const logs = [
-        { action: 'CHECK OUT', item: 'Dell Latitude Laptops', user: 'Mr. Alan Turing', qty: 5, time: '2026-10-28 14:32' },
-        { action: 'CHECK IN', item: 'Basketball Official Size 7', user: 'Coach Davies', qty: 4, time: '2026-10-28 11:15' },
-        { action: 'RESTOCK', item: 'Compound Microscope X400', user: 'Admin Sarah', qty: 6, time: '2026-10-27 09:40' }
-    ];
+    // ==========================================
+    // CATEGORY DISTRIBUTION
+    // ==========================================
 
-    function renderMovements() {
-        document.getElementById('recentMovements').innerHTML = logs.slice(0, 3).map(log => `
-            <div class="movement-item">
-                <div class="movement-info">
-                    <strong>${log.item}</strong>
-                    <span style="font-size: 0.75rem; color: var(--text-muted);">${log.user} • ${log.time}</span>
+    function renderCategories(categories) {
+        const chart = getElement('categoryChart');
+
+        if (!chart) return;
+
+        if (!Array.isArray(categories) || categories.length === 0) {
+            chart.innerHTML = '<p>No category data available.</p>';
+            return;
+        }
+
+        const maxValue = Math.max(
+            ...categories.map(category =>
+                Number(category.total_titles) || 0
+            ),
+            1
+        );
+
+        chart.innerHTML = categories.map((category, index) => {
+            const total = Number(category.total_titles) || 0;
+
+            const barHeight = total > 0
+                ? Math.max((total / maxValue) * 110, 6)
+                : 6;
+
+            return `
+                <div class="chart-column">
+                    <span class="chart-count">${total}</span>
+
+                    <div
+                        class="chart-bar"
+                        style="
+                            height: ${barHeight}px;
+                            background-color: ${colors[index % colors.length]};
+                        "
+                        title="${escapeHTML(category.category_name)}: ${total} titles"
+                    ></div>
+
+                    <span class="chart-label">
+                        ${escapeHTML(category.category_name)}
+                    </span>
                 </div>
-                <span class="badge-tag ${log.action.toLowerCase().replace(/\s+/g, '')}">${log.action} (${log.qty})</span>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
-    // Category Distribution Chart
-    const categories = ['Science & Lab', 'IT & Electronics', 'Sports & Athletics', 'Classroom Supplies', 'Audio/Visual'];
-    const colors = ['#2563eb', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
-    const heights = [75, 60, 35, 12, 12];
+    // ==========================================
+    // RECENT ACTIVITY
+    // ==========================================
 
-    function renderChart() {
-        document.getElementById('categoryChart').innerHTML = categories.map((cat, idx) => `
-            <div class="chart-column">
-                <div class="chart-bar" style="height: ${heights[idx]}%; background-color: ${colors[idx]};"></div>
-                <span class="chart-label">${cat}</span>
-            </div>
-        `).join('');
+    function renderMovements(activities) {
+        const container = getElement('recentMovements');
+
+        if (!container) return;
+
+        if (!Array.isArray(activities) || activities.length === 0) {
+            container.innerHTML = '<p>No recent activity recorded.</p>';
+            return;
+        }
+
+        container.innerHTML = activities.map(activity => {
+            const action = String(activity.action || 'ACTIVITY');
+            const description = activity.description || 'No description available.';
+            const admin = activity.admin_name || activity.username || 'System';
+
+            const badgeClass = action
+                .toLowerCase()
+                .replace(/[^a-z0-9]/g, '');
+
+            const safeDescription = escapeHTML(description);
+
+            return `
+                <div class="movement-item">
+                    <div class="movement-info">
+                        <strong title="${safeDescription}">
+                            ${safeDescription}
+                        </strong>
+
+                        <span>
+                            ${escapeHTML(admin)}
+                            •
+                            ${escapeHTML(formatDate(activity.created_at))}
+                        </span>
+                    </div>
+
+                    <span class="badge-tag ${escapeHTML(badgeClass)}">
+                        ${escapeHTML(action)}
+                    </span>
+                </div>
+            `;
+        }).join('');
     }
 
-    renderChart();
-    renderMovements();
+    // ==========================================
+    // DASHBOARD STATISTICS
+    // ==========================================
 
-    // Modal Control Logic
-    const addItemModal = document.getElementById('addItemModal');
-    const openAddItemBtn = document.getElementById('openAddItemBtn');
-    const openAddItemBannerBtn = document.getElementById('openAddItemBannerBtn');
-    const closeAddItemBtn = document.getElementById('closeAddItemBtn');
-    const cancelAddItemBtn = document.getElementById('cancelAddItemBtn');
-    const addItemForm = document.getElementById('addItemForm');
+    function renderStatistics(statistics) {
+        const books = statistics.books || {};
+        const borrowing = statistics.borrowing || {};
+        const stock = statistics.stock || {};
+        const conditions = statistics.conditions || {};
 
-    function openModal() { addItemModal.classList.add('active'); }
-    function closeModal() { addItemModal.classList.remove('active'); addItemForm.reset(); }
+        setText('kpiTotal', books.total_copies);
+        setText('kpiBorrowed', borrowing.active_borrowed);
+        setText('kpiDueToday', borrowing.due_today);
+        setText('kpiOverdue', borrowing.overdue);
+        setText('kpiLowStock', stock.low_stock_books);
+        setText('kpiDamaged', conditions.damaged_copies);
+        setText('kpiLost', conditions.lost_copies);
 
-    openAddItemBtn.addEventListener('click', openModal);
-    openAddItemBannerBtn.addEventListener('click', openModal);
-    closeAddItemBtn.addEventListener('click', closeModal);
-    cancelAddItemBtn.addEventListener('click', closeModal);
+        setText('kpiTitles', books.total_titles);
+        setText('kpiAvailable', books.available_copies);
+        setText('lowStockThreshold', stock.low_stock_threshold);
+    }
 
-    // Form Submission using itemname, itemcategory, and itemquantity
-    addItemForm.addEventListener('submit', (e) => {
-        e.preventDefault();
+    // ==========================================
+    // LOW STOCK BOOKS
+    // ==========================================
 
-        const name = document.getElementById('itemname').value.trim();
-        const category = document.getElementById('itemcategory').value;
-        const qty = parseInt(document.getElementById('itemquantity').value, 10);
+    function renderLowStockBooks(books) {
+        const container = getElement('lowStockBooks');
 
-        if (!name || !qty) return;
+        if (!container) return;
 
-        // Update Total Items counter dynamically
-        totalStockCount += qty;
-        document.getElementById('kpiTotal').textContent = totalStockCount;
+        if (!Array.isArray(books) || books.length === 0) {
+            container.innerHTML = '<p>No low-stock books found.</p>';
+            return;
+        }
 
-        // Add to recent activity stream
-        const now = new Date();
-        const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        container.innerHTML = books.map(book => {
+            const title = escapeHTML(book.title);
 
-        logs.unshift({
-            action: 'ADD ITEM',
-            item: name,
-            user: 'Allen Jay Alcorcon',
-            qty: qty,
-            time: formattedDate
-        });
+            return `
+                <div class="movement-item">
+                    <div class="movement-info">
+                        <strong title="${title}">
+                            ${title}
+                        </strong>
 
-        renderMovements();
-        closeModal();
-        alert(`Successfully added "${name}" (${qty} units under ${category})!`);
-    });
+                        <span>
+                            ${Number(book.available_copies)} available
+                            / ${Number(book.total_copies)} total
+                        </span>
+                    </div>
+
+                    <span class="badge-tag">LOW STOCK</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ==========================================
+    // LOAD DASHBOARD DATA
+    // ==========================================
+
+    async function loadDashboard() {
+        try {
+            const response = await fetch(API_URL);
+
+            if (!response.ok) {
+                throw new Error(
+                    `Server returned HTTP ${response.status}`
+                );
+            }
+
+            const result = await response.json();
+
+            if (!result.success || !result.data) {
+                throw new Error(
+                    result.message || 'Unable to retrieve dashboard data.'
+                );
+            }
+
+            const data = result.data;
+
+            renderStatistics(data.statistics || {});
+            renderCategories(data.categories || []);
+            renderMovements(data.activities || []);
+            renderLowStockBooks(data.lowStockBooks || []);
+
+            console.log('Dashboard data loaded successfully.');
+
+        } catch (error) {
+            console.error('Dashboard loading error:', error);
+
+            const chart = getElement('categoryChart');
+            const movements = getElement('recentMovements');
+            const lowStock = getElement('lowStockBooks');
+
+            if (chart) {
+                chart.innerHTML =
+                    '<p>Unable to load category information.</p>';
+            }
+
+            if (movements) {
+                movements.innerHTML =
+                    '<p>Unable to load recent activities.</p>';
+            }
+
+            if (lowStock) {
+                lowStock.innerHTML =
+                    '<p>Unable to load low-stock books.</p>';
+            }
+        }
+    }
+
+    // ==========================================
+    // INITIALIZE
+    // ==========================================
+
+    loadDashboard();
 });

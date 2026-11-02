@@ -4,72 +4,209 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School Library System - Check In</title>
+
     <link rel="stylesheet" href="../global.css">
     <link rel="stylesheet" href="checkin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="checkin.js" defer></script>
 </head>
 <body>
 
-    <aside class="sidebar">
-        <div class="brand">
-            <div class="brand-icon"><i class="fa-solid fa-book-bookmark"></i></div>
-            <span class="brand-name">School Library System</span>
-            <span class="version-tag">v2.4</span>
-        </div>
-        <div class="user-profile-card">
-            <div class="avatar-wrapper"><div class="avatar-placeholder">AJ</div><span class="status-indicator"></span></div>
-            <div class="user-info"><div class="user-name">Allen Jay Alcorcon</div><div class="user-role">IT Student</div></div>
-        </div>
-        <nav class="nav-menu">
-            <a href="../dashboard/dashboard.html" class="nav-link"><i class="fa-solid fa-border-all"></i><span>Dashboard</span></a>
-            <a href="../check_out/checkout.html" class="nav-link"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>Check Out</span></a>
-            <a href="../check_in/checkin.html" class="nav-link active"><i class="fa-solid fa-arrow-right-to-bracket"></i><span>Check In</span></a>
-            <a href="../logs/logs.html" class="nav-link"><i class="fa-solid fa-clock-rotate-left"></i><span>Logs</span></a>
-        </nav>
-        <div class="sidebar-footer">
-            <div class="dark-mode-toggle"><span>Dark Mode</span><button id="themeToggleBtn" class="toggle-switch">Toggle</button></div>
-            <button id="logoutBtn" class="logout-btn"><i class="fa-solid fa-power-off"></i> Logout</button>
-        </div>
-    </aside>
+    <div class="app-container">
 
-    <main class="main-content">
-        <header class="top-bar">
-            <div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Search equipment..."></div>
-        </header>
-
-        <div class="view-container">
-            <div class="form-card-centered">
-                <div class="form-header">
-                    <div class="form-icon green"><i class="fa-solid fa-arrow-right-to-bracket"></i></div>
-                    <div>
-                        <h2>Return Item / Check In</h2>
-                        <p>Process returned school property and record condition</p>
-                    </div>
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-book-bookmark"></i>
                 </div>
-                <form id="checkinForm">
-                    <div class="form-group">
-                        <label>ACTIVE CHECKED-OUT ITEM</label>
-                        <select id="checkinActiveSelect" required>
-                            <option>Dell Latitude Laptops — Borrowed by Mr. Alan Turing (5 units)</option>
-                        </select>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>RETURNED QUANTITY</label><input type="number" min="1" value="1" required></div>
-                        <div class="form-group">
-                            <label>ITEM CONDITION</label>
-                            <select><option>Good Condition</option><option>Needs Maintenance</option><option>Damaged</option></select>
+                <span>Library System</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="../dashboard/dashboard.html" class="nav-link">
+                    <i class="fa-solid fa-border-all"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="../students/students.html" class="nav-link">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <span>Students</span>
+                </a>
+
+                <a href="../borrowers/borrowers.html" class="nav-link">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Borrowers</span>
+                </a>
+
+                <a href="../books/books.html" class="nav-link">
+                    <i class="fa-solid fa-book"></i>
+                    <span>Books</span>
+                </a>
+
+                <a href="../categories/categories.html" class="nav-link">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>Categories</span>
+                </a>
+
+                <a href="../publishers/publishers.html" class="nav-link">
+                    <i class="fa-solid fa-building"></i>
+                    <span>Publishers</span>
+                </a>
+
+                <a href="../issue_book/issue.html" class="nav-link">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>Issue Book</span>
+                </a>
+
+                <a href="../check_out/checkout.html" class="nav-link">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Check Out</span>
+                </a>
+
+                <a href="../check_in/checkin.html" class="nav-link active">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <span>Check In</span>
+                </a>
+
+                <a href="../logs/logs.html" class="nav-link">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>Activity Logs</span>
+                </a>
+
+                <a href="../settings/settings.html" class="nav-link">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="dark-mode-toggle">
+                    <span>Dark Mode</span>
+                    <button
+                        id="themeToggleBtn"
+                        class="toggle-switch"
+                        type="button"
+                        aria-label="Toggle dark mode"
+                        aria-pressed="false"
+                    >
+                        Off
+                    </button>
+                </div>
+
+                <button id="logoutBtn" class="logout-btn" type="button">
+                    <i class="fa-solid fa-power-off"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+
+            <header class="top-bar">
+                <div class="top-bar-heading">
+                    <h2>Check In</h2>
+                    <p>Process returned library books</p>
+                </div>
+
+                <div class="top-actions">
+                    <div class="admin-profile">
+                        <div class="admin-avatar">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+
+                        <div class="admin-info">
+                            <span class="admin-name">Administrator</span>
+                            <span class="admin-role">Administrator</span>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label>RETURN NOTES / COMMENTS</label>
-                        <textarea rows="3" placeholder="Add any details about damage or missing accessories..."></textarea>
-                    </div>
-                    <button type="submit" class="btn-success">Complete Return</button>
-                </form>
-            </div>
-        </div>
-    </main>
+                </div>
+            </header>
 
-    <script src="checkin.js"></script>
+            <div class="view-container checkin-page">
+
+                <section class="page-heading">
+                    <div>
+                        <h1>Return Book / Check In</h1>
+                        <p>Process returned library books and record their condition.</p>
+                    </div>
+                </section>
+
+                <section class="widget form-card-centered">
+
+                    <div class="widget-header form-header">
+                        <div class="form-icon green">
+                            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                        </div>
+
+                        <div class="form-title">
+                            <h2>Return Book</h2>
+                            <p>Enter the borrowing record and return details below.</p>
+                        </div>
+                    </div>
+
+                    <form id="checkinForm">
+
+                        <div class="form-group">
+                            <label for="checkinActiveSelect">ACTIVE BORROWING RECORD</label>
+
+                            <select id="checkinActiveSelect" required>
+                                <option value="">Loading active borrowing records...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+
+                            <div class="form-group">
+                                <label for="returnedQuantity">RETURNED QUANTITY</label>
+
+                                <input
+                                    type="number"
+                                    id="returnedQuantity"
+                                    min="1"
+                                    value="1"
+                                    step="1"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="itemCondition">ITEM CONDITION</label>
+
+                                <select id="itemCondition" required>
+                                    <option value="Good">Good Condition</option>
+                                    <option value="Damaged">Damaged</option>
+                                    <option value="Lost">Lost</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="returnRemarks">RETURN NOTES / COMMENTS</label>
+
+                            <textarea
+                                id="returnRemarks"
+                                rows="3"
+                                placeholder="Add details about damage or missing accessories..."
+                            ></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-success">
+                                <i class="fa-solid fa-check"></i>
+                                Complete Return
+                            </button>
+                        </div>
+
+                    </form>
+
+                </section>
+
+            </div>
+        </main>
+
+    </div>
+
 </body>
 </html>

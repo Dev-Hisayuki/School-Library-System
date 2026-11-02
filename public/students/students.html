@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students | Library Management System</title>
+
+    <link rel="stylesheet" href="../global.css">
+    <link rel="stylesheet" href="students.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <script src="students.js" defer></script>
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="sidebar-brand">
+                <i class="fa-solid fa-book-bookmark"></i>
+                <span>Library System</span>
+            </div>
+
+            <nav class="sidebar-nav">
+
+                <a href="../dashboard/dashboard.html" class="nav-link">
+                    <i class="fa-solid fa-border-all"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="students.html" class="nav-link active">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <span>Students</span>
+                </a>
+
+                <a href="../borrowers/borrowers.html" class="nav-link">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Borrowers</span>
+                </a>
+
+                <a href="../books/books.html" class="nav-link">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>Books</span>
+                </a>
+
+                <a href="../categories/categories.html" class="nav-link">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>Categories</span>
+                </a>
+
+                <a href="../publishers/publishers.html" class="nav-link">
+                    <i class="fa-solid fa-building"></i>
+                    <span>Publishers</span>
+                </a>
+
+                <a href="../issue_book/issue.html" class="nav-link">
+                    <i class="fa-solid fa-book"></i>
+                    <span>Issue Book</span>
+                </a>
+
+                <a href="../check_out/checkout.html" class="nav-link">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Check Out</span>
+                </a>
+
+                <a href="../check_in/checkin.html" class="nav-link">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <span>Check In</span>
+                </a>
+
+                <a href="../logs/logs.html" class="nav-link">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>Activity Logs</span>
+                </a>
+
+                <a href="../settings/settings.html" class="nav-link">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span>
+                </a>
+
+            </nav>
+
+            <div class="sidebar-footer">
+
+                <div class="dark-mode-toggle">
+                    <span>Dark Mode</span>
+
+                    <button
+                        id="themeToggleBtn"
+                        class="toggle-switch"
+                        type="button"
+                        aria-pressed="false">
+                        Off
+                    </button>
+                </div>
+
+                <button id="logoutBtn" class="logout-btn" type="button">
+                    <i class="fa-solid fa-power-off"></i>
+                    Logout
+                </button>
+
+            </div>
+
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <!-- TOP BAR -->
+            <header class="top-bar">
+
+                <div>
+                    <h2>Students</h2>
+                    <p>Manage your library's registered students</p>
+                </div>
+
+                <div class="top-actions">
+
+                    <div class="admin-profile">
+
+                        <div class="admin-avatar">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+
+                        <div class="admin-info">
+                            <span class="admin-name">Administrator</span>
+                            <span class="admin-role">System Admin</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+            <!-- PAGE CONTENT -->
+            <section class="view-container student-page">
+
+                <!-- PAGE HEADING -->
+                <div class="page-heading">
+
+                    <div>
+                        <h1>Student Management</h1>
+                        <p>Register, view, and manage student information in the library.</p>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn-primary"
+                        id="showRegisterBtn">
+                        <i class="fa-solid fa-user-plus"></i>
+                        Register Student
+                    </button>
+
+                </div>
+
+                <!-- STATISTICS -->
+                <div class="student-stats">
+
+                    <div class="student-stat-card">
+
+                        <div class="student-stat-info">
+                            <span class="student-stat-label">
+                                Total Students
+                            </span>
+
+                            <h2 id="totalStudents">0</h2>
+
+                            <p>Registered student records</p>
+                        </div>
+
+                        <div class="student-stat-icon blue">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </div>
+
+                    </div>
+
+                    <div class="student-stat-card">
+
+                        <div class="student-stat-info">
+                            <span class="student-stat-label">
+                                Registered Borrowers
+                            </span>
+
+                            <h2 id="totalBorrowers">0</h2>
+
+                            <p>Eligible borrower records</p>
+                        </div>
+
+                        <div class="student-stat-icon green">
+                            <i class="fa-solid fa-book-reader"></i>
+                        </div>
+
+                    </div>
+
+                    <div class="student-stat-card">
+
+                        <div class="student-stat-info">
+                            <span class="student-stat-label">
+                                Students Only
+                            </span>
+
+                            <h2 id="studentsOnly">0</h2>
+
+                            <p>Not yet registered as borrowers</p>
+                        </div>
+
+                        <div class="student-stat-icon orange">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- MESSAGE -->
+                <div
+                    id="messageBox"
+                    class="message-box"
+                    role="alert"
+                    aria-live="polite">
+                </div>
+
+                <!-- REGISTRATION FORM -->
+                <section class="widget form-card" id="registerCard" hidden>
+
+                    <div class="widget-header">
+
+                        <div>
+                            <h3 id="formTitle">Register New Student</h3>
+                            <p>Enter the student's information below.</p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="close-btn"
+                            id="closeFormBtn"
+                            aria-label="Close form">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+
+                    </div>
+
+                    <form id="registerForm">
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+                                <label for="studentNumber">Student Number *</label>
+
+                                <input
+                                    type="text"
+                                    id="studentNumber"
+                                    maxlength="30"
+                                    placeholder="e.g. 2026-0002"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="studentName">Full Name *</label>
+
+                                <input
+                                    type="text"
+                                    id="studentName"
+                                    maxlength="150"
+                                    placeholder="Enter full name"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+
+                                <input
+                                    type="email"
+                                    id="email"
+                                    maxlength="100"
+                                    placeholder="student@example.com">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="course">Course / Program</label>
+
+                                <input
+                                    type="text"
+                                    id="course"
+                                    maxlength="100"
+                                    placeholder="e.g. BS Information Technology">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="yearLevel">Year Level</label>
+
+                                <select id="yearLevel">
+                                    <option value="">Select year level</option>
+                                    <option value="1st Year">1st Year</option>
+                                    <option value="2nd Year">2nd Year</option>
+                                    <option value="3rd Year">3rd Year</option>
+                                    <option value="4th Year">4th Year</option>
+                                    <option value="5th Year">5th Year</option>
+                                    <option value="Graduate">Graduate</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="contactNumber">Contact Number</label>
+
+                                <input
+                                    type="tel"
+                                    id="contactNumber"
+                                    maxlength="30"
+                                    placeholder="Enter contact number">
+                            </div>
+
+                        </div>
+
+                        <div class="form-actions">
+
+                            <button
+                                type="button"
+                                class="btn-secondary"
+                                id="cancelRegisterBtn">
+                                Cancel
+                            </button>
+
+                            <button
+                                type="submit"
+                                class="btn-primary"
+                                id="submitBtn">
+                                <i class="fa-solid fa-user-plus"></i>
+                                Register Student
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </section>
+
+                <!-- STUDENT TABLE -->
+                <div class="widget table-card">
+
+                    <div class="widget-header">
+
+                        <div>
+                            <h2>Registered Students</h2>
+                            <p>View and manage registered student records.</p>
+                        </div>
+
+                        <div class="table-controls">
+
+                            <div class="search-box">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+
+                                <input
+                                    type="search"
+                                    id="searchInput"
+                                    placeholder="Search students..."
+                                    autocomplete="off">
+                            </div>
+
+                            <button
+                                type="button"
+                                class="btn-outline"
+                                id="refreshBtn">
+                                <i class="fa-solid fa-rotate"></i>
+                                Refresh
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>Student No.</th>
+                                    <th>Full Name</th>
+                                    <th>Email Address</th>
+                                    <th>Course / Program</th>
+                                    <th>Year Level</th>
+                                    <th>Contact Number</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="studentTableBody">
+                                <tr>
+                                    <td colspan="8" class="table-message">
+                                        Loading students...
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <div class="table-footer">
+                        <span id="studentCount">0 students found</span>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div
+        class="delete-modal"
+        id="deleteModal"
+        aria-hidden="true">
+
+        <div
+            class="delete-modal-content"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="deleteModalTitle">
+
+            <button
+                type="button"
+                class="delete-modal-close"
+                id="closeDeleteModalBtn"
+                aria-label="Close">
+                &times;
+            </button>
+
+            <div class="delete-modal-icon">
+                <i class="fa-solid fa-trash"></i>
+            </div>
+
+            <h2 id="deleteModalTitle">Delete Student?</h2>
+
+            <p id="deleteModalMessage">
+                Are you sure you want to delete this student?
+            </p>
+
+            <div class="delete-modal-actions">
+
+                <button
+                    type="button"
+                    class="modal-cancel-btn"
+                    id="cancelDeleteBtn">
+                    Cancel
+                </button>
+
+                <button
+                    type="button"
+                    class="modal-delete-btn"
+                    id="confirmDeleteBtn">
+                    Delete Student
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -76,7 +76,16 @@ This project is more than a simple database program because of its automated bus
           ▼
     [ FINE ALERTS ]
 ```
+## Database Setup
 
+1. Start Apache and MySQL using XAMPP.
+2. Open phpMyAdmin at http://localhost/phpmyadmin.
+3. Create a database named `school_library_system`.
+4. Import the shared `school_library_system.sql` file.
+5. Copy `.env.example` to `.env`.
+6. Update the database credentials in `.env`.
+7. Run `npm install`.
+8. Start the server using `node index.js`.
 ---
 
 ## Ownership Matrix (Section 5.4 Compliance)
