@@ -1,9 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // API ENDPOINTS
     const API_URL = `${window.location.origin}/api/borrowers`;
     const STUDENTS_API_URL = `${window.location.origin}/api/students`;
 
-    // DOM ELEMENTS
     const tableBody = document.getElementById('borrowerTableBody');
     const registerForm = document.getElementById('registerForm');
     const registerCard = document.getElementById('registerCard');
@@ -11,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchInput');
     const studentSelect = document.getElementById('studentSelect');
     const selectedStudentDetails = document.getElementById('selectedStudentDetails');
+    const borrowerCount = document.getElementById('borrowerCount');
 
     const selectedStudentId = document.getElementById('selectedStudentId');
     const selectedStudentNumber = document.getElementById('selectedStudentNumber');
@@ -25,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let borrowers = [];
     let students = [];
 
-    // SAFE HTML OUTPUT
     function escapeHTML(value) {
         return String(value ?? '').replace(/[&<>"']/g, character => ({
             '&': '&amp;',
@@ -36,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
         })[character]);
     }
 
-    // API RESPONSE HANDLER
     async function fetchJSON(url, options = {}) {
         const response = await fetch(url, {
             ...options,
@@ -57,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return result;
     }
 
-    // DARK MODE
     function applyTheme() {
         const isDark = localStorage.getItem('theme') === 'dark';
 
@@ -83,7 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // LOGOUT
     const logoutBtn = document.getElementById('logoutBtn');
 
     if (logoutBtn) {
@@ -93,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // DISPLAY MESSAGES
     function showMessage(message, type = 'success') {
         if (!messageBox) return;
 
@@ -108,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
         messageBox.className = 'message-box';
     }
 
-    // LOAD STUDENTS
     async function loadStudents() {
         studentSelect.innerHTML = `
             <option value="">Loading students...</option>
@@ -144,7 +137,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // POPULATE STUDENT DROPDOWN
     function populateStudentSelect() {
         const availableStudents = students.filter(student =>
             Number(student.is_borrower) === 0
@@ -176,7 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
         studentSelect.disabled = false;
     }
 
-    // DISPLAY SELECTED STUDENT DETAILS
     function displaySelectedStudent() {
         const studentId = studentSelect.value;
 
@@ -200,7 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     studentSelect.addEventListener('change', displaySelectedStudent);
 
-    // LOAD BORROWERS
     async function loadBorrowers() {
         tableBody.innerHTML = `
             <tr>
@@ -230,6 +220,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 </tr>
             `;
 
+            if (borrowerCount) {
+                borrowerCount.textContent = '0 registered borrowers';
+            }
+
             showMessage(error.message, 'error');
 
         } finally {
@@ -239,8 +233,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // DISPLAY BORROWER TABLE
     function displayBorrowers(list) {
+        if (borrowerCount) {
+            borrowerCount.textContent = `${list.length} registered ${list.length === 1 ? 'borrower' : 'borrowers'}`;
+        }
+
         if (!list.length) {
             tableBody.innerHTML = `
                 <tr>
@@ -261,18 +258,13 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
     }
 
-    // OPEN REGISTRATION FORM
     document.getElementById('showRegisterBtn').addEventListener('click', async () => {
         clearMessage();
-
         registerCard.hidden = false;
-
         await loadStudents();
-
         studentSelect.focus();
     });
 
-    // CLOSE REGISTRATION FORM
     document.getElementById('cancelRegisterBtn').addEventListener('click', () => {
         registerCard.hidden = true;
         registerForm.reset();
@@ -280,7 +272,6 @@ document.addEventListener('DOMContentLoaded', () => {
         clearMessage();
     });
 
-    // REGISTER BORROWER
     registerForm.addEventListener('submit', async event => {
         event.preventDefault();
 
@@ -333,12 +324,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('Borrower registration failed:', error);
-
             showMessage(error.message, 'error');
 
         } finally {
             registerSubmitBtn.disabled = false;
-
             registerSubmitBtn.innerHTML = `
                 <i class="fa-solid fa-user-plus"></i>
                 Register Borrower
@@ -346,7 +335,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // SEARCH BORROWERS
     searchInput.addEventListener('input', () => {
         const search = searchInput.value.trim().toLowerCase();
 
@@ -366,16 +354,13 @@ document.addEventListener('DOMContentLoaded', () => {
         displayBorrowers(filtered);
     });
 
-    // REFRESH
     refreshBtn.addEventListener('click', async () => {
         clearMessage();
-
         await Promise.all([
             loadBorrowers(),
             loadStudents()
         ]);
     });
 
-    // INITIAL LOAD
     loadBorrowers();
 });

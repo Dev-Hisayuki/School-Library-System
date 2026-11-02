@@ -3,146 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Borrow Details | School Library</title>
-
+    <title>Borrow Details | School Library System</title>
     <link rel="stylesheet" href="../global.css">
     <link rel="stylesheet" href="details.css">
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="brand">
-            <i class="fas fa-book-open"></i>
-            <span>School Library</span>
+<div class="app-container">
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fa-solid fa-book-bookmark"></i>
+            <span>Library System</span>
         </div>
-
-        <div class="profile-card">
-            <i class="fas fa-user-circle"></i>
-            <span>Library Staff</span>
-        </div>
-
-        <nav>
-            <a href="../dashboard/dashboard.html">
-                <i class="fas fa-chart-line"></i> Dashboard
-            </a>
-
-            <a href="../borrowers/borrowers.html">
-                <i class="fas fa-users"></i> Borrowers
-            </a>
-
-            <a href="../issue_book/issue.html">
-                <i class="fas fa-book"></i> Issue Book
-            </a>
-
-            <a href="../check_in/checkin.html">
-                <i class="fas fa-undo"></i> Check In
-            </a>
-
-            <a href="../logs/logs.html">
-                <i class="fas fa-history"></i> Logs
-            </a>
+        <nav class="sidebar-nav">
+            <a href="../dashboard/dashboard.html" class="nav-link"><i class="fa-solid fa-chart-line"></i><span>Dashboard</span></a>
+            <a href="../students/students.html" class="nav-link"><i class="fa-solid fa-user-graduate"></i><span>Students</span></a>
+            <a href="../borrowers/borrowers.html" class="nav-link"><i class="fa-solid fa-users"></i><span>Borrowers</span></a>
+            <a href="../books/books.html" class="nav-link"><i class="fa-solid fa-book-open"></i><span>Books</span></a>
+            <a href="../categories/categories.html" class="nav-link"><i class="fa-solid fa-layer-group"></i><span>Categories</span></a>
+            <a href="../publishers/publishers.html" class="nav-link"><i class="fa-solid fa-building"></i><span>Publishers</span></a>
+            <a href="../issue_book/issue.html" class="nav-link"><i class="fa-solid fa-book"></i><span>Issue Book</span></a>
+            <a href="../check_out/checkout.html" class="nav-link"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>Check Out</span></a>
+            <a href="../check_in/checkin.html" class="nav-link"><i class="fa-solid fa-arrow-right-to-bracket"></i><span>Check In</span></a>
+            <a href="../logs/logs.html" class="nav-link"><i class="fa-solid fa-clock-rotate-left"></i><span>Activity Logs</span></a>
+            <a href="../settings/settings.html" class="nav-link"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
         </nav>
-
-        <div class="sidebar-bottom">
-            <button id="themeToggleBtn">
-                <i class="fas fa-moon"></i> Dark Mode
-            </button>
-
-            <button id="logoutBtn">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
+        <div class="sidebar-footer">
+            <div class="dark-mode-toggle">
+                <span>Dark Mode</span>
+                <button id="themeToggleBtn" class="toggle-switch" type="button">Off</button>
+            </div>
+            <button id="logoutBtn" class="logout-btn" type="button"><i class="fa-solid fa-power-off"></i> Logout</button>
         </div>
-    </div>
+    </aside>
 
     <main class="main-content">
-
         <header class="topbar">
-            <h2>Borrow Details</h2>
-        </header>
-
-        <section class="page-heading">
             <div>
                 <h1>Borrow Details</h1>
                 <p>Search and view a library borrowing transaction.</p>
             </div>
-        </section>
-
-        <section class="search-card">
-            <form id="searchForm">
-                <div class="form-group">
-                    <label for="borrowId">Borrow ID</label>
-                    <input
-                        type="number"
-                        id="borrowId"
-                        min="1"
-                        placeholder="Enter Borrow ID"
-                        required
-                    >
-                </div>
-
-                <button type="submit" class="btn-primary" id="searchBtn">
-                    <i class="fas fa-search"></i> Search Borrow
-                </button>
-            </form>
-        </section>
-
-        <div id="messageBox" class="message-box" hidden></div>
-
-        <section id="detailsCard" class="details-card" hidden>
-
-            <div class="details-header">
+            <div class="admin-profile">
+                <div class="admin-avatar"><i class="fa-solid fa-user"></i></div>
                 <div>
-                    <h2>Transaction Information</h2>
-                    <p id="borrowNumber"></p>
+                    <strong>Administrator</strong>
+                    <small>Library Admin</small>
                 </div>
-
-                <span id="statusBadge" class="status-badge"></span>
             </div>
+        </header>
 
-            <div class="details-grid">
+        <section class="view-container">
+            <section class="search-card">
+                <form id="searchForm">
+                    <div class="form-group">
+                        <label for="borrowId">Borrow ID</label>
+                        <input type="number" id="borrowId" min="1" placeholder="Enter Borrow ID" required>
+                    </div>
+                    <button type="submit" class="btn-primary" id="searchBtn">
+                        <i class="fa-solid fa-search"></i> Search Borrow
+                    </button>
+                </form>
+            </section>
 
-                <div class="detail-item">
-                    <label>Student Name</label>
-                    <p id="studentName"></p>
+            <div id="messageBox" class="message-box" hidden></div>
+
+            <section id="detailsCard" class="details-card" hidden>
+                <div class="details-header">
+                    <div>
+                        <h2>Transaction Information</h2>
+                        <p id="borrowNumber"></p>
+                    </div>
+                    <span id="statusBadge" class="status-badge"></span>
                 </div>
 
-                <div class="detail-item">
-                    <label>Student ID</label>
-                    <p id="studentId"></p>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <label>Student Name</label>
+                        <p id="studentName"></p>
+                    </div>
+                    <div class="detail-item">
+                        <label>Student ID</label>
+                        <p id="studentId"></p>
+                    </div>
+                    <div class="detail-item">
+                        <label>Book Title</label>
+                        <p id="bookTitle"></p>
+                    </div>
+                    <div class="detail-item">
+                        <label>Book ID</label>
+                        <p id="bookId"></p>
+                    </div>
+                    <div class="detail-item">
+                        <label>Borrow Date</label>
+                        <p id="borrowDate"></p>
+                    </div>
+                    <div class="detail-item">
+                        <label>Due Date</label>
+                        <p id="dueDate"></p>
+                    </div>
+                    <div class="detail-item">
+                        <label>Return Date</label>
+                        <p id="returnDate"></p>
+                    </div>
                 </div>
-
-                <div class="detail-item">
-                    <label>Book Title</label>
-                    <p id="bookTitle"></p>
-                </div>
-
-                <div class="detail-item">
-                    <label>Book ID</label>
-                    <p id="bookId"></p>
-                </div>
-
-                <div class="detail-item">
-                    <label>Borrow Date</label>
-                    <p id="borrowDate"></p>
-                </div>
-
-                <div class="detail-item">
-                    <label>Due Date</label>
-                    <p id="dueDate"></p>
-                </div>
-
-                <div class="detail-item">
-                    <label>Return Date</label>
-                    <p id="returnDate"></p>
-                </div>
-
-            </div>
+            </section>
         </section>
-
     </main>
+</div>
 
-    <script src="details.js"></script>
+<script src="details.js"></script>
 </body>
 </html>

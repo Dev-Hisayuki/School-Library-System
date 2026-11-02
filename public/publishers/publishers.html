@@ -1,220 +1,149 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Publishers | Library Management System</title>
-
     <link rel="stylesheet" href="../global.css">
     <link rel="stylesheet" href="publishers.css">
-
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="publishers.js" defer></script>
 </head>
-
 <body>
-
     <div class="app-container">
-
-        <!-- SIDEBAR -->
         <aside class="sidebar">
-
             <div class="sidebar-brand">
                 <i class="fa-solid fa-book-bookmark"></i>
                 <span>Library System</span>
             </div>
-
             <nav class="sidebar-nav">
-
                 <a href="../dashboard/dashboard.html" class="nav-link">
                     <i class="fa-solid fa-border-all"></i>
                     <span>Dashboard</span>
                 </a>
-
                 <a href="../students/students.html" class="nav-link">
                     <i class="fa-solid fa-user-graduate"></i>
                     <span>Students</span>
                 </a>
-
                 <a href="../borrowers/borrowers.html" class="nav-link">
                     <i class="fa-solid fa-users"></i>
                     <span>Borrowers</span>
                 </a>
-
                 <a href="../books/books.html" class="nav-link">
                     <i class="fa-solid fa-book-open"></i>
                     <span>Books</span>
                 </a>
-
                 <a href="../categories/categories.html" class="nav-link">
                     <i class="fa-solid fa-layer-group"></i>
                     <span>Categories</span>
                 </a>
-
-                <a href="../publishers/publishers.html" class="nav-link active">
+                <a href="publishers.html" class="nav-link active">
                     <i class="fa-solid fa-building"></i>
                     <span>Publishers</span>
                 </a>
-
                 <a href="../issue_book/issue.html" class="nav-link">
                     <i class="fa-solid fa-book"></i>
                     <span>Issue Book</span>
                 </a>
-
                 <a href="../check_out/checkout.html" class="nav-link">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                     <span>Check Out</span>
                 </a>
-
                 <a href="../check_in/checkin.html" class="nav-link">
                     <i class="fa-solid fa-arrow-right-to-bracket"></i>
                     <span>Check In</span>
                 </a>
-
                 <a href="../logs/logs.html" class="nav-link">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                     <span>Activity Logs</span>
                 </a>
-
                 <a href="../settings/settings.html" class="nav-link">
                     <i class="fa-solid fa-gear"></i>
                     <span>Settings</span>
                 </a>
-
             </nav>
-
             <div class="sidebar-footer">
-
                 <div class="dark-mode-toggle">
                     <span>Dark Mode</span>
-                    <button
-                        id="themeToggleBtn"
-                        class="toggle-switch"
-                        type="button"
-                        aria-pressed="false">
+                    <button id="themeToggleBtn" class="toggle-switch" type="button" aria-pressed="false">
                         Off
                     </button>
                 </div>
-
                 <button id="logoutBtn" class="logout-btn" type="button">
                     <i class="fa-solid fa-power-off"></i>
                     Logout
                 </button>
-
             </div>
-
         </aside>
-
-        <!-- MAIN CONTENT -->
         <main class="main-content">
-
-            <!-- TOPBAR -->
             <header class="top-bar">
-
                 <div>
                     <h2>Publishers</h2>
                     <p>Manage your library's publishing companies</p>
                 </div>
-
                 <div class="top-actions">
                     <div class="admin-profile">
                         <div class="admin-avatar">
                             <i class="fa-solid fa-user"></i>
                         </div>
-
                         <div class="admin-info">
                             <span class="admin-name">Administrator</span>
                             <span class="admin-role">System Admin</span>
                         </div>
                     </div>
                 </div>
-
             </header>
-
-            <!-- PAGE CONTENT -->
             <section class="view-container publisher-page">
-
                 <div class="page-heading">
                     <div>
                         <h1>Publisher Management</h1>
                         <p>Manage and organize your book publishers.</p>
                     </div>
-
-                    <button
-                        type="button"
-                        class="btn-primary"
-                        id="addPublisherBtn">
+                    <button type="button" class="btn-primary" id="addPublisherBtn">
                         <i class="fa-solid fa-plus"></i>
                         Add Publisher
                     </button>
                 </div>
-
-                <!-- STATISTICS -->
                 <div class="publisher-stats">
-
                     <div class="publisher-stat-card">
                         <div class="publisher-stat-info">
-                            <span class="publisher-stat-label">
-                                Total Publishers
-                            </span>
+                            <span class="publisher-stat-label">Total Publishers</span>
                             <h2 id="totalPublishers">0</h2>
                         </div>
-
                         <div class="publisher-stat-icon blue">
                             <i class="fa-solid fa-building"></i>
                         </div>
                     </div>
-
                     <div class="publisher-stat-card">
                         <div class="publisher-stat-info">
-                            <span class="publisher-stat-label">
-                                With Email Address
-                            </span>
+                            <span class="publisher-stat-label">With Email Address</span>
                             <h2 id="publishersWithEmail">0</h2>
                         </div>
-
                         <div class="publisher-stat-icon green">
                             <i class="fa-solid fa-envelope"></i>
                         </div>
                     </div>
-
                     <div class="publisher-stat-card">
                         <div class="publisher-stat-info">
-                            <span class="publisher-stat-label">
-                                With Contact Number
-                            </span>
+                            <span class="publisher-stat-label">With Contact Number</span>
                             <h2 id="publishersWithContact">0</h2>
                         </div>
-
                         <div class="publisher-stat-icon orange">
                             <i class="fa-solid fa-phone"></i>
                         </div>
                     </div>
-
                 </div>
-
-                <!-- PUBLISHER TABLE -->
                 <div class="widget table-card">
-
                     <div class="widget-header">
                         <div>
                             <h2>Publisher Records</h2>
                             <p>View and manage registered publishers.</p>
                         </div>
-
                         <div class="search-box">
                             <i class="fa-solid fa-magnifying-glass"></i>
-                            <input
-                                type="search"
-                                id="publisherSearch"
-                                placeholder="Search publishers..."
-                                autocomplete="off">
+                            <input type="search" id="publisherSearch" placeholder="Search publishers..." autocomplete="off">
                         </div>
                     </div>
-
                     <div class="table-wrapper">
                         <table>
                             <thead>
@@ -226,117 +155,58 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-
                             <tbody id="publishersTableBody">
                                 <tr>
-                                    <td colspan="5" class="table-message">
-                                        Loading publishers...
-                                    </td>
+                                    <td colspan="5" class="table-message">Loading publishers...</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-
                     <div class="table-footer">
                         <span id="publisherCount">0 publishers found</span>
                     </div>
-
                 </div>
-
             </section>
-
         </main>
-
     </div>
-
-    <!-- ADD / EDIT PUBLISHER MODAL -->
     <div class="modal-overlay" id="publisherModal">
-
-        <div class="modal-card" role="dialog" aria-modal="true"
-             aria-labelledby="publisherModalTitle">
-
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="publisherModalTitle">
             <div class="modal-header">
                 <div>
                     <h2 id="publisherModalTitle">Add New Publisher</h2>
                     <p>Enter the publisher's information below.</p>
                 </div>
-
-                <button
-                    type="button"
-                    class="close-btn"
-                    id="closePublisherModal"
-                    aria-label="Close modal">
+                <button type="button" class="close-btn" id="closePublisherModal" aria-label="Close modal">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-
             <form id="publisherForm">
-
                 <input type="hidden" id="publisherId">
-
                 <div class="form-group">
                     <label for="publisherName">Publisher Name</label>
-                    <input
-                        type="text"
-                        id="publisherName"
-                        placeholder="Enter publisher name"
-                        required>
+                    <input type="text" id="publisherName" placeholder="Enter publisher name" required>
                 </div>
-
                 <div class="form-group">
                     <label for="publisherEmail">Email Address</label>
-                    <input
-                        type="email"
-                        id="publisherEmail"
-                        placeholder="Enter email address">
+                    <input type="email" id="publisherEmail" placeholder="Enter email address">
                 </div>
-
                 <div class="form-group">
                     <label for="publisherContact">Contact Number</label>
-                    <input
-                        type="text"
-                        id="publisherContact"
-                        placeholder="Enter contact number">
+                    <input type="text" id="publisherContact" placeholder="Enter contact number">
                 </div>
-
                 <div class="form-group">
                     <label for="publisherAddress">Address</label>
-                    <textarea
-                        id="publisherAddress"
-                        rows="3"
-                        placeholder="Enter publisher address"></textarea>
+                    <textarea id="publisherAddress" rows="3" placeholder="Enter publisher address"></textarea>
                 </div>
-
                 <div class="form-actions">
-                    <button
-                        type="button"
-                        class="btn-secondary"
-                        id="cancelPublisherBtn">
-                        Cancel
-                    </button>
-
-                    <button
-                        type="submit"
-                        class="btn-primary"
-                        id="savePublisherBtn">
-                        <i class="fa-solid fa-floppy-disk"></i>
-                        Save Publisher
+                    <button type="button" class="btn-secondary" id="cancelPublisherBtn">Cancel</button>
+                    <button type="submit" class="btn-primary" id="savePublisherBtn">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Publisher
                     </button>
                 </div>
-
             </form>
-
         </div>
-
     </div>
-
-    <!-- NOTIFICATION -->
-    <div
-        class="message-box"
-        id="publisherMessage"
-        role="alert"
-        aria-live="polite">
-    </div>
-
+    <div class="message-box" id="publisherMessage" role="alert" aria-live="polite"></div>
 </body>
 </html>

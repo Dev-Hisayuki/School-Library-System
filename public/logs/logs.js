@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     const logsTableBody = document.getElementById('logsTableBody');
     const searchInput = document.getElementById('logsSearchInput');
@@ -13,12 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let activityLogs = [];
     let filteredLogs = [];
 
-    // DARK MODE
     const themeToggleBtn = document.getElementById('themeToggleBtn');
 
     function applyTheme() {
         const isDarkMode = localStorage.getItem('theme') === 'dark';
-
         document.body.classList.toggle('dark-mode', isDarkMode);
 
         if (themeToggleBtn) {
@@ -30,18 +27,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     themeToggleBtn?.addEventListener('click', () => {
         const isDarkMode = document.body.classList.contains('dark-mode');
-
         localStorage.setItem('theme', isDarkMode ? 'light' : 'dark');
         applyTheme();
     });
 
-    // LOGOUT
     document.getElementById('logoutBtn')?.addEventListener('click', () => {
         localStorage.removeItem('authToken');
         window.location.href = '../login/login.html';
     });
 
-    // HELPER FUNCTIONS
     function escapeHTML(value) {
         return String(value ?? '').replace(/[&<>"']/g, character => {
             const entities = {
@@ -51,20 +45,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 '"': '&quot;',
                 "'": '&#039;'
             };
-
             return entities[character];
         });
     }
 
     function formatDate(dateValue) {
         if (!dateValue) return '—';
-
         const date = new Date(dateValue);
-
         if (Number.isNaN(date.getTime())) {
             return '—';
         }
-
         return date.toLocaleString('en-PH', {
             year: 'numeric',
             month: 'short',
@@ -77,17 +67,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function getActionClass(action) {
         const normalized = String(action || '').toLowerCase();
-
         if (normalized.includes('login')) return 'login';
         if (normalized.includes('logout')) return 'logout';
         if (normalized.includes('checkout')) return 'checkout';
         if (normalized.includes('checkin')) return 'checkin';
         if (normalized.includes('restock')) return 'restock';
-
         return 'default';
     }
 
-    // SUMMARY CARDS
     function updateSummary() {
         const loginCount = activityLogs.filter(log =>
             String(log.action || '').toUpperCase() === 'LOGIN'
@@ -113,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // RENDER ACTIVITY LOGS
     function renderLogs(logs) {
         filteredLogs = logs;
 
@@ -126,7 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </td>
                 </tr>
             `;
-
             logsCountElement.textContent = 'Showing 0 activities';
             return;
         }
@@ -134,46 +119,29 @@ document.addEventListener('DOMContentLoaded', () => {
         logsTableBody.innerHTML = logs.map(log => {
             const action = escapeHTML(log.action || 'UNKNOWN');
             const actionClass = getActionClass(log.action);
-
-            const adminName = escapeHTML(
-                log.admin_name || 'Unknown Administrator'
-            );
-
-            const username = escapeHTML(
-                log.username || 'No username'
-            );
-
-            const description = escapeHTML(
-                log.description || 'No description provided.'
-            );
+            const adminName = escapeHTML(log.admin_name || 'Unknown Administrator');
+            const username = escapeHTML(log.username || 'No username');
+            const description = escapeHTML(log.description || 'No description provided.');
 
             return `
                 <tr>
                     <td>${escapeHTML(formatDate(log.created_at))}</td>
-
                     <td>
                         <div class="admin-cell">
                             <div class="admin-avatar">
-                                ${escapeHTML(
-                                    (log.admin_name || 'A')
-                                        .charAt(0)
-                                        .toUpperCase()
-                                )}
+                                ${escapeHTML((log.admin_name || 'A').charAt(0).toUpperCase())}
                             </div>
-
                             <div class="admin-details">
                                 <strong>${adminName}</strong>
                                 <span>@${username}</span>
                             </div>
                         </div>
                     </td>
-
                     <td>
                         <span class="badge-tag ${actionClass}">
                             ${action}
                         </span>
                     </td>
-
                     <td class="description-cell">
                         ${description}
                     </td>
@@ -181,14 +149,11 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }).join('');
 
-        logsCountElement.textContent =
-            `Showing ${logs.length} of ${activityLogs.length} activities`;
+        logsCountElement.textContent = `Showing ${logs.length} of ${activityLogs.length} activities`;
     }
 
-    // SEARCH
     function searchLogs() {
         const searchTerm = searchInput.value.trim().toLowerCase();
-
         const results = activityLogs.filter(log => {
             const searchableText = [
                 log.action,
@@ -205,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchInput?.addEventListener('input', searchLogs);
 
-    // LOAD LOGS FROM DATABASE
     async function loadLogs() {
         logsTableBody.innerHTML = `
             <tr>
@@ -221,28 +185,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
 
             if (!response.ok || !result.success) {
-                throw new Error(
-                    result.message || 'Failed to load activity logs.'
-                );
+                throw new Error(result.message || 'Failed to load activity logs.');
             }
 
-            activityLogs = Array.isArray(result.data)
-                ? result.data
-                : [];
-
-            activityLogs.sort((a, b) => {
-                return new Date(b.created_at) - new Date(a.created_at);
-            });
+            activityLogs = Array.isArray(result.data) ? result.data : [];
+            activityLogs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
             updateSummary();
             searchLogs();
 
         } catch (error) {
             console.error('Activity logs error:', error);
-
             activityLogs = [];
             filteredLogs = [];
-
             updateSummary();
 
             logsTableBody.innerHTML = `
@@ -260,10 +215,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // REFRESH
     refreshButton?.addEventListener('click', async () => {
         refreshButton.disabled = true;
-
         refreshButton.innerHTML = `
             <i class="fa-solid fa-spinner fa-spin"></i>
             Refreshing...
@@ -272,28 +225,19 @@ document.addEventListener('DOMContentLoaded', () => {
         await loadLogs();
 
         refreshButton.disabled = false;
-
         refreshButton.innerHTML = `
             <i class="fa-solid fa-rotate"></i>
             Refresh
         `;
     });
 
-    // EXPORT CSV
     function exportCSV() {
         if (filteredLogs.length === 0) {
             alert('There are no activity logs to export.');
             return;
         }
 
-        const headers = [
-            'Timestamp',
-            'Administrator',
-            'Username',
-            'Action',
-            'Description'
-        ];
-
+        const headers = ['Timestamp', 'Administrator', 'Username', 'Action', 'Description'];
         const rows = filteredLogs.map(log => [
             formatDate(log.created_at),
             log.admin_name || 'Unknown Administrator',
@@ -306,33 +250,20 @@ document.addEventListener('DOMContentLoaded', () => {
             return `"${String(value ?? '').replace(/"/g, '""')}"`;
         }
 
-        const csvContent = [
-            headers,
-            ...rows
-        ].map(row => row.map(escapeCSV).join(',')).join('\r\n');
-
-        const blob = new Blob(
-            ['\uFEFF' + csvContent],
-            { type: 'text/csv;charset=utf-8;' }
-        );
-
+        const csvContent = [headers, ...rows].map(row => row.map(escapeCSV).join(',')).join('\r\n');
+        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
 
         link.href = url;
-        link.download = `school-library-activity-logs-${new Date()
-            .toISOString()
-            .slice(0, 10)}.csv`;
-
+        link.download = `school-library-activity-logs-${new Date().toISOString().slice(0, 10)}.csv`;
         document.body.appendChild(link);
         link.click();
         link.remove();
-
         URL.revokeObjectURL(url);
     }
 
     exportButton?.addEventListener('click', exportCSV);
 
-    // INITIAL LOAD
     loadLogs();
 });

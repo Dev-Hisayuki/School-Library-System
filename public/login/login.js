@@ -3,6 +3,25 @@ const errorEl = document.getElementById('error');
 const loadingEl = document.getElementById('loading');
 const passwordInput = document.getElementById('password');
 const togglePasswordBtn = document.getElementById('togglePassword');
+const pageThemeToggle = document.getElementById('pageThemeToggle');
+
+function applyTheme() {
+    const isDark = localStorage.getItem('theme') === 'dark';
+    document.body.classList.toggle('dark-mode', isDark);
+    if (pageThemeToggle) {
+        pageThemeToggle.textContent = isDark ? '☀️' : '🌙';
+    }
+}
+
+applyTheme();
+
+if (pageThemeToggle) {
+    pageThemeToggle.addEventListener('click', () => {
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        applyTheme();
+    });
+}
 
 togglePasswordBtn.addEventListener('click', () => {
     const isPassword = passwordInput.type === 'password';

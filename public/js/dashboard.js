@@ -1,1 +1,0 @@
-notepad ".\public\js\dashboard.js"

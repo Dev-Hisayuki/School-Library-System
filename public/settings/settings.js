@@ -1,336 +1,274 @@
-
 document.addEventListener('DOMContentLoaded', () => {
-    const tableBody = document.getElementById('settingsTableBody');
-    const settingModal = document.getElementById('settingModal');
-    const settingForm = document.getElementById('settingForm');
+    const API = '/api/settings';
+    const $ = id => document.getElementById(id);
 
-    const settingId = document.getElementById('settingId');
-    const settingKey = document.getElementById('settingKey');
-    const settingValue = document.getElementById('settingValue');
-    const settingDescription = document.getElementById('settingDescription');
+    const elements = {
+        tableBody: $('settingsTableBody'),
+        totalSettings: $('totalSettings'),
+        databaseStatus: $('databaseStatus'),
+        refreshBtn: $('refreshSettingsBtn'),
+        openAddBtn: $('openAddSettingBtn'),
+        modal: $('settingModal'),
+        form: $('settingForm'),
+        modalTitle: $('modalTitle'),
+        settingId: $('settingId'),
+        settingKey: $('settingKey'),
+        settingValue: $('settingValue'),
+        settingDescription: $('settingDescription'),
+        closeModalBtn: $('closeModalBtn'),
+        cancelModalBtn: $('cancelModalBtn'),
+        themeToggleBtn: $('themeToggleBtn'),
+        logoutBtn: $('logoutBtn')
+    };
 
     let settings = [];
+    let editingSettingId = null;
 
-    // DARK MODE
-    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    async function request(url, options = {}) {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch(url, {
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                ...(options.headers || {})
+            }
+        });
+
+        let result;
+        try {
+            result = await response.json();
+        } catch {
+            throw new Error('The server returned an invalid response.');
+        }
+
+        if (!response.ok || result.success === false) {
+            throw new Error(result.message || 'Something went wrong.');
+        }
+
+        return result;
+    }
 
     function applyTheme() {
         const isDarkMode = localStorage.getItem('theme') === 'dark';
-
         document.body.classList.toggle('dark-mode', isDarkMode);
-
-        if (themeToggleBtn) {
-            themeToggleBtn.textContent = isDarkMode ? 'On' : 'Off';
+        if (elements.themeToggleBtn) {
+            elements.themeToggleBtn.textContent = isDarkMode ? 'On' : 'Off';
         }
     }
 
     applyTheme();
 
-    themeToggleBtn?.addEventListener('click', () => {
+    elements.themeToggleBtn?.addEventListener('click', () => {
         const isDarkMode = document.body.classList.contains('dark-mode');
-
         localStorage.setItem('theme', isDarkMode ? 'light' : 'dark');
         applyTheme();
     });
 
-    // LOGOUT
-    document.getElementById('logoutBtn')?.addEventListener('click', () => {
+    elements.logoutBtn?.addEventListener('click', () => {
         localStorage.removeItem('authToken');
         window.location.href = '../login/login.html';
     });
 
-    // ESCAPE HTML
     function escapeHTML(value) {
-        return String(value ?? '').replace(/[&<>"']/g, character => ({
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        })[character]);
+        return String(value ?? '').replace(/[&<>"']/g, character => {
+            const entities = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return entities[character];
+        });
     }
 
-    // LOAD SETTINGS
+    function formatDate(dateValue) {
+        if (!dateValue) return '—';
+        const date = new Date(dateValue);
+        if (Number.isNaN(date.getTime())) return '—';
+        return date.toLocaleString('en-PH', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'Asia/Manila'
+        });
+    }
+
     async function loadSettings() {
-        if (!tableBody) return;
-
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="5" class="loading-message">
-                    Loading settings...
-                </td>
-            </tr>
-        `;
-
-        try {
-            const response = await fetch('/api/settings');
-            const result = await response.json();
-
-            if (!response.ok || !result.success) {
-                throw new Error(
-                    result.message || 'Unable to load settings.'
-                );
-            }
-
-            settings = Array.isArray(result.data) ? result.data : [];
-
-            const totalSettings = document.getElementById('totalSettings');
-            const databaseStatus = document.getElementById('databaseStatus');
-
-            if (totalSettings) {
-                totalSettings.textContent = settings.length;
-            }
-
-            if (databaseStatus) {
-                databaseStatus.textContent = 'Connected';
-            }
-
-            if (settings.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="empty-message">
-                            <i class="fa-solid fa-gear"></i>
-                            <p>No system settings found.</p>
-                            <p>Add your first setting to get started.</p>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            tableBody.innerHTML = settings.map(setting => `
+        if (elements.tableBody) {
+            elements.tableBody.innerHTML = `
                 <tr>
-                    <td>
-                        <span class="setting-key">
-                            ${escapeHTML(setting.setting_key)}
-                        </span>
-                    </td>
-
-                    <td>
-                        <div class="setting-value">
-                            ${escapeHTML(setting.setting_value)}
-                        </div>
-                    </td>
-
-                    <td>
-                        ${escapeHTML(setting.description || '—')}
-                    </td>
-
-                    <td>
-                        ${setting.updated_at
-                            ? escapeHTML(
-                                new Date(setting.updated_at).toLocaleString()
-                            )
-                            : '—'}
-                    </td>
-
-                    <td>
-                        <div class="action-buttons">
-                            <button
-                                class="action-btn edit"
-                                data-action="edit"
-                                data-id="${Number(setting.id)}"
-                                title="Edit setting"
-                                type="button">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-
-                            <button
-                                class="action-btn delete"
-                                data-action="delete"
-                                data-id="${Number(setting.id)}"
-                                title="Delete setting"
-                                type="button">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-
-        } catch (error) {
-            console.error('Settings error:', error);
-
-            const databaseStatus = document.getElementById('databaseStatus');
-
-            if (databaseStatus) {
-                databaseStatus.textContent = 'Error';
-            }
-
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="5" class="empty-message">
-                        Unable to load system settings.
-                        <br>
-                        ${escapeHTML(error.message)}
-                    </td>
+                    <td colspan="5" class="loading-message">Loading settings...</td>
                 </tr>
             `;
         }
-    }
 
-    // OPEN MODAL
-    function openModal(editing = false, setting = null) {
-        settingForm.reset();
-        settingId.value = '';
-
-        document.getElementById('modalTitle').textContent =
-            editing ? 'Edit Setting' : 'Add New Setting';
-
-        document.getElementById('saveSettingBtn').textContent =
-            editing ? 'Update Setting' : 'Save Setting';
-
-        settingKey.disabled = editing;
-
-        if (editing && setting) {
-            settingId.value = setting.id;
-            settingKey.value = setting.setting_key;
-            settingValue.value = setting.setting_value ?? '';
-            settingDescription.value = setting.description ?? '';
+        if (elements.databaseStatus) {
+            elements.databaseStatus.textContent = 'Checking...';
         }
-
-        settingModal.classList.add('show');
-    }
-
-    // CLOSE MODAL
-    function closeModal() {
-        settingModal.classList.remove('show');
-        settingForm.reset();
-        settingKey.disabled = false;
-    }
-
-    // MODAL EVENTS
-    document.getElementById('openAddSettingBtn')
-        ?.addEventListener('click', () => openModal());
-
-    document.getElementById('closeModalBtn')
-        ?.addEventListener('click', closeModal);
-
-    document.getElementById('cancelModalBtn')
-        ?.addEventListener('click', closeModal);
-
-    settingModal?.addEventListener('click', event => {
-        if (event.target === settingModal) {
-            closeModal();
-        }
-    });
-
-    // CREATE OR UPDATE SETTING
-    settingForm.addEventListener('submit', async event => {
-        event.preventDefault();
-
-        const id = settingId.value;
-        const editing = Boolean(id);
-
-        const payload = {
-            setting_key: settingKey.value.trim(),
-            setting_value: settingValue.value,
-            description: settingDescription.value.trim()
-        };
-
-        if (!editing && !payload.setting_key) {
-            alert('Please enter a setting key.');
-            return;
-        }
-
-        const saveButton = document.getElementById('saveSettingBtn');
-
-        saveButton.disabled = true;
-        saveButton.textContent = 'Saving...';
 
         try {
-            const response = await fetch(
-                editing ? `/api/settings/${id}` : '/api/settings',
-                {
-                    method: editing ? 'PUT' : 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                }
-            );
+            const result = await request(API);
+            settings = Array.isArray(result.data) ? result.data : [];
 
-            const result = await response.json();
-
-            if (!response.ok || !result.success) {
-                throw new Error(
-                    result.message || 'Unable to save setting.'
-                );
+            if (elements.totalSettings) {
+                elements.totalSettings.textContent = settings.length;
+            }
+            if (elements.databaseStatus) {
+                elements.databaseStatus.textContent = 'Connected';
             }
 
-            closeModal();
-            await loadSettings();
-
-            alert(result.message);
-
+            renderSettings();
         } catch (error) {
-            console.error('Save setting error:', error);
-            alert(error.message);
-
-        } finally {
-            saveButton.disabled = false;
-            saveButton.textContent =
-                editing ? 'Update Setting' : 'Save Setting';
+            console.error('Load settings error:', error);
+            if (elements.databaseStatus) {
+                elements.databaseStatus.textContent = 'Error';
+            }
+            if (elements.tableBody) {
+                elements.tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="loading-message">
+                            Unable to load settings: ${escapeHTML(error.message)}
+                        </td>
+                    </tr>
+                `;
+            }
         }
-    });
+    }
 
-    // EDIT OR DELETE SETTING
-    tableBody.addEventListener('click', async event => {
-        const button = event.target.closest('button[data-action]');
+    function renderSettings() {
+        if (!elements.tableBody) return;
 
-        if (!button) return;
-
-        const id = Number(button.dataset.id);
-        const action = button.dataset.action;
-
-        const setting = settings.find(item => Number(item.id) === id);
-
-        if (!setting) return;
-
-        if (action === 'edit') {
-            openModal(true, setting);
+        if (settings.length === 0) {
+            elements.tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="loading-message">No settings found.</td>
+                </tr>
+            `;
             return;
         }
 
-        if (action === 'delete') {
-            const confirmed = confirm(
-                `Are you sure you want to delete "${setting.setting_key}"?`
-            );
+        elements.tableBody.innerHTML = settings.map(setting => `
+            <tr>
+                <td><strong>${escapeHTML(setting.setting_key)}</strong></td>
+                <td>${escapeHTML(setting.setting_value)}</td>
+                <td>${escapeHTML(setting.description || '—')}</td>
+                <td>${escapeHTML(formatDate(setting.updated_at || setting.created_at))}</td>
+                <td>
+                    <div class="action-buttons">
+                        <button type="button" class="action-btn" data-action="edit" data-id="${setting.setting_id}" title="Edit Setting">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button type="button" class="action-btn delete" data-action="delete" data-id="${setting.setting_id}" title="Delete Setting">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
 
-            if (!confirmed) return;
+    function openModal(setting = null) {
+        if (!elements.modal) return;
+        elements.form?.reset();
 
-            button.disabled = true;
+        editingSettingId = setting ? setting.setting_id : null;
+        if (elements.settingId) elements.settingId.value = setting ? setting.setting_id : '';
+        if (elements.settingKey) elements.settingKey.value = setting ? setting.setting_key : '';
+        if (elements.settingValue) elements.settingValue.value = setting ? setting.setting_value : '';
+        if (elements.settingDescription) elements.settingDescription.value = setting ? setting.description || '' : '';
+        if (elements.modalTitle) elements.modalTitle.textContent = setting ? 'Edit Setting' : 'Add New Setting';
 
-            try {
-                const response = await fetch(`/api/settings/${id}`, {
-                    method: 'DELETE'
+        elements.modal.classList.add('show');
+        document.body.classList.add('modal-open');
+    }
+
+    function closeModal() {
+        if (!elements.modal) return;
+        elements.modal.classList.remove('show');
+        document.body.classList.remove('modal-open');
+        editingSettingId = null;
+        elements.form?.reset();
+    }
+
+    async function saveSetting(e) {
+        e.preventDefault();
+
+        const key = elements.settingKey.value.trim();
+        const value = elements.settingValue.value.trim();
+        const description = elements.settingDescription.value.trim();
+
+        if (!key || !value) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+
+        const payload = {
+            setting_key: key,
+            setting_value: value,
+            description: description || null
+        };
+
+        try {
+            if (editingSettingId) {
+                await request(`${API}/${editingSettingId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(payload)
                 });
-
-                const result = await response.json();
-
-                if (!response.ok || !result.success) {
-                    throw new Error(
-                        result.message || 'Unable to delete setting.'
-                    );
-                }
-
-                await loadSettings();
-                alert(result.message);
-
-            } catch (error) {
-                console.error('Delete setting error:', error);
-                alert(error.message);
-
-            } finally {
-                button.disabled = false;
+            } else {
+                await request(API, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
             }
+
+            closeModal();
+            loadSettings();
+        } catch (error) {
+            console.error('Save setting error:', error);
+            alert(error.message || 'Failed to save setting.');
+        }
+    }
+
+    async function deleteSetting(id) {
+        if (!confirm('Are you sure you want to delete this setting?')) return;
+
+        try {
+            await request(`${API}/${id}`, {
+                method: 'DELETE'
+            });
+            loadSettings();
+        } catch (error) {
+            console.error('Delete setting error:', error);
+            alert(error.message || 'Failed to delete setting.');
+        }
+    }
+
+    elements.openAddBtn?.addEventListener('click', () => openModal());
+    elements.closeModalBtn?.addEventListener('click', closeModal);
+    elements.cancelModalBtn?.addEventListener('click', closeModal);
+    elements.form?.addEventListener('submit', saveSetting);
+    elements.refreshBtn?.addEventListener('click', loadSettings);
+
+    elements.modal?.addEventListener('click', e => {
+        if (e.target === elements.modal) closeModal();
+    });
+
+    elements.tableBody?.addEventListener('click', e => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        const setting = settings.find(s => String(s.setting_id) === String(id));
+
+        if (btn.dataset.action === 'edit' && setting) {
+            openModal(setting);
+        } else if (btn.dataset.action === 'delete') {
+            deleteSetting(id);
         }
     });
 
-    // REFRESH
-    document.getElementById('refreshSettingsBtn')
-        ?.addEventListener('click', loadSettings);
-
-    // INITIAL LOAD
     loadSettings();
 });

@@ -1,18 +1,9 @@
-
-/* ==========================================
-   CATEGORIES PAGE - MATCHING PUBLISHERS PAGE
-========================================== */
-
 .app-container {
     display: flex;
     width: 100%;
     height: 100vh;
     overflow: hidden;
 }
-
-/* ==========================================
-   SIDEBAR
-========================================== */
 
 .sidebar {
     width: 250px;
@@ -84,10 +75,6 @@
     font-weight: 600;
 }
 
-/* ==========================================
-   SIDEBAR FOOTER
-========================================== */
-
 .sidebar-footer {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding-top: 15px;
@@ -138,10 +125,6 @@
 .logout-btn:hover {
     color: #f87171;
 }
-
-/* ==========================================
-   MAIN CONTENT AND TOPBAR
-========================================== */
 
 .main-content {
     flex-grow: 1;
@@ -223,10 +206,6 @@
     padding: 30px;
 }
 
-/* ==========================================
-   PAGE HEADING
-========================================== */
-
 .page-heading {
     display: flex;
     align-items: center;
@@ -246,10 +225,6 @@
     color: var(--text-muted);
     font-size: 0.85rem;
 }
-
-/* ==========================================
-   BUTTONS
-========================================== */
 
 .btn-primary,
 .btn-secondary,
@@ -304,10 +279,6 @@
 .btn-outline:hover {
     background: var(--bg-main);
 }
-
-/* ==========================================
-   CATEGORY STATISTICS
-========================================== */
 
 .category-stats {
     display: grid;
@@ -378,10 +349,6 @@
     color: #f97316;
 }
 
-/* ==========================================
-   CATEGORY WIDGET
-========================================== */
-
 .widget {
     min-width: 0;
     background: var(--bg-card);
@@ -410,10 +377,6 @@
     color: var(--text-muted);
     font-size: 0.8rem;
 }
-
-/* ==========================================
-   SEARCH
-========================================== */
 
 .search-box {
     display: flex;
@@ -447,10 +410,6 @@
 .search-box input::placeholder {
     color: var(--text-muted);
 }
-
-/* ==========================================
-   CATEGORY TABLE
-========================================== */
 
 .table-card {
     overflow: hidden;
@@ -521,10 +480,6 @@
     font-size: 0.8rem;
 }
 
-/* ==========================================
-   TABLE ACTIONS
-========================================== */
-
 .action-buttons {
     display: flex;
     align-items: center;
@@ -551,10 +506,6 @@
     color: #dc2626;
     border-color: #dc2626;
 }
-
-/* ==========================================
-   MODALS
-========================================== */
 
 .modal-overlay {
     position: fixed;
@@ -624,10 +575,6 @@ body.modal-open {
     color: #ef4444;
 }
 
-/* ==========================================
-   CATEGORY FORM
-========================================== */
-
 .form-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -687,10 +634,6 @@ body.modal-open {
     margin-top: 22px;
 }
 
-/* ==========================================
-   TOAST NOTIFICATIONS
-========================================== */
-
 #categoryMessage,
 #pageMessage {
     position: fixed;
@@ -737,10 +680,6 @@ body.modal-open {
     }
 }
 
-/* ==========================================
-   DARK MODE
-========================================== */
-
 body.dark-mode .category-stat-icon.blue {
     color: #93c5fd;
     background: #1e3a8a;
@@ -769,10 +708,6 @@ body.dark-mode #pageMessage.error {
     background: #7f1d1d;
     border-color: #991b1b;
 }
-
-/* ==========================================
-   RESPONSIVE DESIGN
-========================================== */
 
 @media (max-width: 1100px) {
     .category-stats {

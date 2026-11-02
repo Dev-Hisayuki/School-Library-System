@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const issueBtn = document.getElementById('issueBtn');
     const messageBox = document.getElementById('messageBox');
 
-    // DARK MODE
     const themeToggleBtn = document.getElementById('themeToggleBtn');
 
     function applyTheme() {
@@ -29,7 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // LOGOUT
     const logoutBtn = document.getElementById('logoutBtn');
 
     if (logoutBtn) {
@@ -39,7 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // DISPLAY MESSAGES
     function showMessage(message, type) {
         if (!messageBox) return;
 
@@ -48,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
         messageBox.hidden = false;
     }
 
-    // FORMAT API DATE
     function formatDate(dateValue) {
         if (!dateValue) return 'Not available';
 
@@ -66,7 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // LOAD REGISTERED BORROWERS
     async function loadStudents() {
         try {
             studentSelect.innerHTML =
@@ -111,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // LOAD AVAILABLE BOOKS
     async function loadBooks() {
         try {
             bookSelect.innerHTML =
@@ -163,7 +157,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // SUBMIT BORROWING TRANSACTION
     if (issueForm) {
         issueForm.addEventListener('submit', async event => {
             event.preventDefault();
@@ -226,7 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // INITIAL LOADING
     loadStudents();
     loadBooks();
 });

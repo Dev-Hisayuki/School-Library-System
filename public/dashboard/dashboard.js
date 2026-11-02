@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     const API_URL = '/api/dashboard';
 
@@ -52,10 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // DARK MODE
-    // ==========================================
-
     const themeToggleBtn = getElement('themeToggleBtn');
 
     function applyTheme() {
@@ -85,10 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
         applyTheme();
     });
 
-    // ==========================================
-    // LOGOUT
-    // ==========================================
-
     getElement('logoutBtn')?.addEventListener('click', () => {
         localStorage.removeItem('authToken');
         localStorage.removeItem('admin');
@@ -96,10 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         window.location.href = '../login/login.html';
     });
-
-    // ==========================================
-    // CATEGORY DISTRIBUTION
-    // ==========================================
 
     function renderCategories(categories) {
         const chart = getElement('categoryChart');
@@ -146,10 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
-    // ==========================================
-    // RECENT ACTIVITY
-    // ==========================================
-
     function renderMovements(activities) {
         const container = getElement('recentMovements');
 
@@ -193,10 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
-    // ==========================================
-    // DASHBOARD STATISTICS
-    // ==========================================
-
     function renderStatistics(statistics) {
         const books = statistics.books || {};
         const borrowing = statistics.borrowing || {};
@@ -215,10 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setText('kpiAvailable', books.available_copies);
         setText('lowStockThreshold', stock.low_stock_threshold);
     }
-
-    // ==========================================
-    // LOW STOCK BOOKS
-    // ==========================================
 
     function renderLowStockBooks(books) {
         const container = getElement('lowStockBooks');
@@ -252,10 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
-    // ==========================================
-    // LOAD DASHBOARD DATA
-    // ==========================================
-
     async function loadDashboard() {
         try {
             const response = await fetch(API_URL);
@@ -281,8 +252,6 @@ document.addEventListener('DOMContentLoaded', () => {
             renderMovements(data.activities || []);
             renderLowStockBooks(data.lowStockBooks || []);
 
-            console.log('Dashboard data loaded successfully.');
-
         } catch (error) {
             console.error('Dashboard loading error:', error);
 
@@ -306,10 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-
-    // ==========================================
-    // INITIALIZE
-    // ==========================================
 
     loadDashboard();
 });

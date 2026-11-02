@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let confirmationCallback = null;
 
-    // CUSTOM DIALOG STYLES
     const dialogStyles = document.createElement('style');
 
     dialogStyles.textContent = `
@@ -148,7 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.head.appendChild(dialogStyles);
 
-    // CREATE CUSTOM DIALOG
     const dialogOverlay = document.createElement('div');
 
     dialogOverlay.className = 'custom-dialog-overlay';
@@ -186,7 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const dialogCancel = dialogOverlay.querySelector('#dialogCancel');
     const dialogConfirm = dialogOverlay.querySelector('#dialogConfirm');
 
-    // CLOSE DIALOG
     function closeDialog(value = false) {
         dialogOverlay.hidden = true;
 
@@ -196,7 +193,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (callback) callback(value);
     }
 
-    // SHOW CONFIRMATION
     function showConfirmation(message) {
         return new Promise(resolve => {
             confirmationCallback = resolve;
@@ -214,7 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // SHOW INFORMATION MESSAGE
     function showDialog(message, type = 'success') {
         confirmationCallback = null;
 
@@ -259,7 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // DARK MODE
     function applyTheme() {
         const isDarkMode = localStorage.getItem('theme') === 'dark';
 
@@ -280,13 +274,11 @@ document.addEventListener('DOMContentLoaded', () => {
         applyTheme();
     });
 
-    // LOGOUT
     logoutBtn?.addEventListener('click', () => {
         localStorage.removeItem('authToken');
         window.location.href = '../login/login.html';
     });
 
-    // LOAD ACTIVE BORROWINGS
     async function loadActiveBorrowings() {
         if (!activeSelect) return;
 
@@ -351,7 +343,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // UPDATE QUANTITY LIMIT
     function updateQuantityLimit() {
         const selectedOption = activeSelect?.selectedOptions[0];
 
@@ -366,7 +357,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     activeSelect?.addEventListener('change', updateQuantityLimit);
 
-    // PROCESS RETURN
     checkinForm?.addEventListener('submit', async event => {
         event.preventDefault();
 
@@ -459,6 +449,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // INITIAL LOAD
     loadActiveBorrowings();
 });

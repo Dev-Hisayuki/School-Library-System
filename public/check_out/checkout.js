@@ -1,6 +1,5 @@
 const API_URL = `${window.location.origin}/api/borrows`;
 
-// DOM ELEMENTS
 const tableBody = document.getElementById('borrowingsTableBody');
 const loadingMessage = document.getElementById('loadingMessage');
 const errorMessage = document.getElementById('errorMessage');
@@ -14,7 +13,6 @@ const recordCount = document.getElementById('recordCount');
 
 let borrowings = [];
 
-// ESCAPE HTML
 function escapeHTML(value) {
     return String(value ?? '').replace(/[&<>"']/g, character => ({
         '&': '&amp;',
@@ -25,7 +23,6 @@ function escapeHTML(value) {
     })[character]);
 }
 
-// FORMAT DATABASE DATES
 function formatDate(value) {
     if (!value) return '—';
 
@@ -43,7 +40,6 @@ function formatDate(value) {
     });
 }
 
-// UPDATE SUMMARY CARDS
 function updateSummary(records) {
     if (totalActive) {
         totalActive.textContent = records.length;
@@ -62,7 +58,6 @@ function updateSummary(records) {
     }
 }
 
-// DISPLAY BORROWING RECORDS
 function renderBorrowings(records) {
     if (!tableBody) return;
 
@@ -132,7 +127,6 @@ function renderBorrowings(records) {
     }
 }
 
-// SEARCH BORROWING RECORDS
 function filterBorrowings() {
     if (!searchInput) {
         renderBorrowings(borrowings);
@@ -160,7 +154,6 @@ function filterBorrowings() {
     renderBorrowings(filteredRecords);
 }
 
-// LOAD BORROWING RECORDS
 async function loadBorrowings() {
     if (!tableBody) return;
 
@@ -238,7 +231,6 @@ async function loadBorrowings() {
     }
 }
 
-// DARK MODE
 const themeToggleBtn = document.getElementById('themeToggleBtn');
 
 function applyTheme() {
@@ -266,7 +258,6 @@ if (themeToggleBtn) {
     });
 }
 
-// LOGOUT
 const logoutBtn = document.getElementById('logoutBtn');
 
 if (logoutBtn) {
@@ -276,7 +267,6 @@ if (logoutBtn) {
     });
 }
 
-// EVENT LISTENERS
 if (refreshBtn) {
     refreshBtn.addEventListener('click', loadBorrowings);
 }
@@ -285,5 +275,4 @@ if (searchInput) {
     searchInput.addEventListener('input', filterBorrowings);
 }
 
-// INITIAL LOAD
 loadBorrowings();
