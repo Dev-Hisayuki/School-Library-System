@@ -62,7 +62,6 @@ const ReturnTransaction = {
         try {
             await connection.beginTransaction();
 
-            // Lock the borrowing record.
             const [borrowRows] = await connection.execute(
                 `SELECT borrow_id, book_id, due_date, status
                  FROM borrow_records
@@ -81,7 +80,6 @@ const ReturnTransaction = {
                 throw new Error('This borrowing record is not active.');
             }
 
-            // Get the original borrowed quantity.
             const [detailRows] = await connection.execute(
                 `SELECT quantity
                  FROM borrow_details
@@ -95,7 +93,6 @@ const ReturnTransaction = {
 
             const borrowedQuantity = Number(detailRows[0].quantity);
 
-            // Calculate how many copies have already been returned.
             const [returnedRows] = await connection.execute(
                 `SELECT COALESCE(SUM(rd.quantity_returned), 0) AS returned_quantity
                  FROM return_details rd
@@ -133,7 +130,6 @@ const ReturnTransaction = {
 
             const formattedDate = actualReturnDate.toISOString().slice(0, 10);
 
-            // Create the return record.
             const [returnResult] = await connection.execute(
                 `INSERT INTO return_records
                     (borrow_id, processed_by, return_date, remarks)
@@ -148,7 +144,6 @@ const ReturnTransaction = {
 
             const returnId = returnResult.insertId;
 
-            // Save the returned book details.
             await connection.execute(
                 `INSERT INTO return_details
                     (return_id, book_id, quantity_returned, item_condition)
@@ -161,7 +156,6 @@ const ReturnTransaction = {
                 ]
             );
 
-            // Only books in good condition become available again.
             if (itemCondition === 'Good') {
                 await connection.execute(
                     `UPDATE books
@@ -171,7 +165,6 @@ const ReturnTransaction = {
                 );
             }
 
-            // Update the borrowing status after the final return.
             if (finalReturn) {
                 await connection.execute(
                     `UPDATE borrow_records
@@ -180,7 +173,6 @@ const ReturnTransaction = {
                     [formattedDate, borrowId]
                 );
 
-                // Read the configured overdue fine rate.
                 const [settings] = await connection.execute(
                     `SELECT setting_value
                      FROM system_settings
@@ -216,7 +208,6 @@ const ReturnTransaction = {
                     );
                 }
             } else {
-                // Keep the record overdue if its due date has passed.
                 await connection.execute(
                     `UPDATE borrow_records
                      SET status = CASE
@@ -228,7 +219,6 @@ const ReturnTransaction = {
                 );
             }
 
-            // Record the activity using the same transaction.
             await connection.execute(
                 `INSERT INTO activity_logs
                     (admin_id, action, description)
@@ -288,33 +278,6 @@ const ReturnTransaction = {
         const [rows] = await db.execute(sql);
         return rows;
     }
-  create: async (borrowId, processedBy, returnDate) => {
-    const sql = `INSERT INTO return_transactions (borrow_id, processed_by, return_date) VALUES (?, ?, ?)`;
-    const [result] = await db.execute(sql, [borrowId, processedBy, returnDate || new Date()]);
-    return result.insertId;
-  },
-
-  getAllWithDetails: async () => {
-    const sql = `
-      SELECT 
-        rt.id AS return_id,
-        rt.return_date,
-        u.username AS processed_by,
-        s.student_name AS borrower_name,
-        i.item_name,
-        rd.quantity_returned,
-        rd.item_condition
-      FROM return_transactions rt
-      INNER JOIN users u ON rt.processed_by = u.id
-      INNER JOIN borrow_records br ON rt.borrow_id = br.borrow_id
-      INNER JOIN students s ON br.student_id = s.student_id
-      INNER JOIN items i ON br.item_id = i.item_id
-      INNER JOIN return_details rd ON rt.id = rd.return_id
-      ORDER BY rt.return_date DESC
-    `;
-    const [rows] = await db.execute(sql);
-    return rows;
-  }
 };
 
 module.exports = ReturnTransaction;

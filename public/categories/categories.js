@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     const API = '/api/categories';
 
@@ -35,10 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let categories = [];
     let editingCategoryId = null;
 
-    // =========================================
-    // API REQUEST
-    // =========================================
-
     async function request(url, options = {}) {
         const token = localStorage.getItem('authToken');
 
@@ -66,10 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return result;
     }
 
-    // =========================================
-    // CATEGORY DATA HELPERS
-    // =========================================
-
     function getCategoryId(category) {
         return category.category_id ?? category.id ?? '';
     }
@@ -90,10 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
             0
         );
     }
-
-    // =========================================
-    // LOAD CATEGORIES
-    // =========================================
 
     async function loadCategories() {
         showTableMessage('Loading categories...');
@@ -118,10 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return false;
         }
     }
-
-    // =========================================
-    // RENDER TABLE
-    // =========================================
 
     function renderCategories() {
         if (!elements.tableBody) return;
@@ -211,10 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
             `${count} ${count === 1 ? 'category' : 'categories'} found`;
     }
 
-    // =========================================
-    // STATISTICS
-    // =========================================
-
     function updateStatistics() {
         const total = categories.length;
 
@@ -239,10 +218,6 @@ document.addEventListener('DOMContentLoaded', () => {
             elements.emptyCategories.textContent = emptyCategories;
         }
     }
-
-    // =========================================
-    // OPEN / CLOSE MODAL
-    // =========================================
 
     function openModal(category = null) {
         if (!elements.modal || !elements.form) return;
@@ -293,10 +268,6 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.form?.reset();
         hideMessage();
     }
-
-    // =========================================
-    // SAVE CATEGORY
-    // =========================================
 
     async function saveCategory(event) {
         event.preventDefault();
@@ -365,10 +336,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // =========================================
-    // EDIT CATEGORY
-    // =========================================
-
     function editCategory(categoryId) {
         const category = categories.find(
             item => String(getCategoryId(item)) === String(categoryId)
@@ -381,10 +348,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         openModal(category);
     }
-
-    // =========================================
-    // DELETE CATEGORY
-    // =========================================
 
     async function deleteCategory(categoryId) {
         const category = categories.find(
@@ -423,10 +386,6 @@ document.addEventListener('DOMContentLoaded', () => {
             showMessage(error.message, 'error');
         }
     }
-
-    // =========================================
-    // CONFIRM DIALOG
-    // =========================================
 
     function showConfirmDialog(title, message, confirmText = 'Confirm') {
         return new Promise(resolve => {
@@ -491,10 +450,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // =========================================
-    // NOTIFICATIONS
-    // =========================================
-
     function showMessage(message, type = 'success') {
         const target = elements.modal?.classList.contains('show')
             ? elements.message
@@ -527,10 +482,6 @@ document.addEventListener('DOMContentLoaded', () => {
         clearTimeout(showMessage.timeout);
     }
 
-    // =========================================
-    // DARK MODE
-    // =========================================
-
     function updateThemeButton(isDark) {
         if (!elements.themeButton) return;
 
@@ -562,10 +513,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateThemeButton(isDark);
     }
 
-    // =========================================
-    // LOGOUT
-    // =========================================
-
     async function logout() {
         const confirmed = await showConfirmDialog(
             'Log Out?',
@@ -582,10 +529,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = '../login/login.html';
     }
 
-    // =========================================
-    // HTML ESCAPING
-    // =========================================
-
     function escapeHTML(value) {
         return String(value ?? '').replace(/[&<>"']/g, character => {
             const replacements = {
@@ -599,10 +542,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return replacements[character];
         });
     }
-
-    // =========================================
-    // EVENT LISTENERS
-    // =========================================
 
     elements.addButton?.addEventListener('click', () => openModal());
 
@@ -637,10 +576,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     elements.themeButton?.addEventListener('click', toggleTheme);
     elements.logoutButton?.addEventListener('click', logout);
-
-    // =========================================
-    // INITIALIZE
-    // =========================================
 
     applyTheme();
     loadCategories();

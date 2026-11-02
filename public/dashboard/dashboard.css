@@ -1,17 +1,7 @@
-
-/* ==========================================
-   DASHBOARD PAGE
-   MATCHES PUBLISHERS DESIGN
-========================================== */
-
 .dashboard-page {
     width: 100%;
     padding: 30px;
 }
-
-/* ==========================================
-   APP LAYOUT
-========================================== */
 
 .app-container {
     display: flex;
@@ -19,10 +9,6 @@
     height: 100vh;
     overflow: hidden;
 }
-
-/* ==========================================
-   SIDEBAR
-========================================== */
 
 .sidebar {
     width: 250px;
@@ -98,10 +84,6 @@
     font-weight: 600;
 }
 
-/* ==========================================
-   SIDEBAR FOOTER
-========================================== */
-
 .sidebar-footer {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding-top: 15px;
@@ -157,10 +139,6 @@
     color: #f87171;
 }
 
-/* ==========================================
-   MAIN CONTENT
-========================================== */
-
 .main-content {
     flex-grow: 1;
     min-width: 0;
@@ -171,10 +149,6 @@
     margin-left: 250px;
     background: var(--bg-main);
 }
-
-/* ==========================================
-   TOPBAR
-========================================== */
 
 .top-bar {
     min-height: 75px;
@@ -246,10 +220,6 @@
     font-size: 0.72rem;
 }
 
-/* ==========================================
-   PAGE CONTENT
-========================================== */
-
 .page-heading {
     display: flex;
     align-items: center;
@@ -269,10 +239,6 @@
     color: var(--text-muted);
     font-size: 0.85rem;
 }
-
-/* ==========================================
-   BUTTONS
-========================================== */
 
 .btn-primary,
 .btn-secondary,
@@ -349,10 +315,6 @@
     background: #edf5ed;
 }
 
-/* ==========================================
-   WELCOME BANNER
-========================================== */
-
 .banner {
     background: linear-gradient(135deg, #315c3d, #294f37);
     color: #ffffff;
@@ -384,10 +346,6 @@
     gap: 10px;
     flex-wrap: wrap;
 }
-
-/* ==========================================
-   KPI CARDS
-========================================== */
 
 .kpi-grid {
     display: grid;
@@ -456,10 +414,6 @@
     color: #8b5cf6;
 }
 
-/* ==========================================
-   KPI ICONS
-========================================== */
-
 .kpi-icon {
     width: 42px;
     height: 42px;
@@ -495,10 +449,6 @@
     background: #f3e8ff;
     color: #a855f7;
 }
-
-/* ==========================================
-   DASHBOARD WIDGETS
-========================================== */
 
 .dashboard-widgets {
     display: grid;
@@ -549,10 +499,6 @@
     white-space: nowrap;
 }
 
-/* ==========================================
-   CATEGORY DISTRIBUTION CHART
-========================================== */
-
 .bar-chart-container,
 #categoryChart {
     min-width: 0;
@@ -599,10 +545,6 @@
     text-align: center;
     overflow-wrap: anywhere;
 }
-
-/* ==========================================
-   RECENT ACTIVITY AND LOW STOCK
-========================================== */
 
 .movement-list,
 #recentMovements,
@@ -702,10 +644,6 @@
     color: #dc2626;
 }
 
-/* ==========================================
-   EMPTY AND LOADING STATES
-========================================== */
-
 #categoryChart > p,
 #recentMovements > p,
 #lowStockBooks > p,
@@ -717,10 +655,6 @@
     font-size: 0.83rem;
     text-align: center;
 }
-
-/* ==========================================
-   DARK MODE
-========================================== */
 
 body.dark-mode .banner {
     background: linear-gradient(135deg, #294f37, #1d3c2a);
@@ -797,10 +731,6 @@ body.dark-mode .logout-btn {
 body.dark-mode .logout-btn:hover {
     color: #fecaca;
 }
-
-/* ==========================================
-   RESPONSIVE DESIGN
-========================================== */
 
 @media (max-width: 1100px) {
     .kpi-grid {
@@ -967,11 +897,7 @@ body.dark-mode .logout-btn:hover {
         min-width: 55px;
     }
 }
-/* ==========================================
-   DASHBOARD CONTENT HEIGHT CONTROL
-========================================== */
 
-/* Category Distribution */
 #categoryChart {
     height: 250px;
     max-height: 250px;
@@ -988,7 +914,6 @@ body.dark-mode .logout-btn:hover {
     height: 180px;
 }
 
-/* Recent Activity */
 #recentMovements {
     max-height: 320px;
     overflow-y: auto;
@@ -997,7 +922,6 @@ body.dark-mode .logout-btn:hover {
     align-items: stretch;
 }
 
-/* Scrollbar styling */
 #recentMovements::-webkit-scrollbar,
 #categoryChart::-webkit-scrollbar {
     width: 6px;

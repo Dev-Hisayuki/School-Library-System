@@ -4,17 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School Library System - Check Out</title>
-
     <link rel="stylesheet" href="../global.css">
     <link rel="stylesheet" href="checkout.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <script src="checkout.js" defer></script>
 </head>
 <body>
-
     <div class="app-container">
-
         <aside class="sidebar">
             <div class="sidebar-brand">
                 <div class="brand-icon">
@@ -22,99 +18,76 @@
                 </div>
                 <span>Library System</span>
             </div>
-
             <nav class="sidebar-nav">
                 <a href="../dashboard/dashboard.html" class="nav-link">
                     <i class="fa-solid fa-border-all"></i>
                     <span>Dashboard</span>
                 </a>
-
                 <a href="../students/students.html" class="nav-link">
                     <i class="fa-solid fa-user-graduate"></i>
                     <span>Students</span>
                 </a>
-
                 <a href="../borrowers/borrowers.html" class="nav-link">
                     <i class="fa-solid fa-users"></i>
                     <span>Borrowers</span>
                 </a>
-
                 <a href="../books/books.html" class="nav-link">
                     <i class="fa-solid fa-book"></i>
                     <span>Books</span>
                 </a>
-
                 <a href="../categories/categories.html" class="nav-link">
                     <i class="fa-solid fa-layer-group"></i>
                     <span>Categories</span>
                 </a>
-
                 <a href="../publishers/publishers.html" class="nav-link">
                     <i class="fa-solid fa-building"></i>
                     <span>Publishers</span>
                 </a>
-
                 <a href="../issue_book/issue.html" class="nav-link">
                     <i class="fa-solid fa-book-open"></i>
                     <span>Issue Book</span>
                 </a>
-
                 <a href="../check_out/checkout.html" class="nav-link active">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                     <span>Check Out</span>
                 </a>
-
                 <a href="../check_in/checkin.html" class="nav-link">
                     <i class="fa-solid fa-arrow-right-to-bracket"></i>
                     <span>Check In</span>
                 </a>
-
                 <a href="../logs/logs.html" class="nav-link">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                     <span>Activity Logs</span>
                 </a>
-
                 <a href="../settings/settings.html" class="nav-link">
                     <i class="fa-solid fa-gear"></i>
                     <span>Settings</span>
                 </a>
             </nav>
-
             <div class="sidebar-footer">
                 <div class="dark-mode-toggle">
                     <span>Dark Mode</span>
-                    <button
-                        id="themeToggleBtn"
-                        class="toggle-switch"
-                        type="button"
-                        aria-label="Toggle dark mode"
-                        aria-pressed="false"
-                    >
+                    <button id="themeToggleBtn" class="toggle-switch" type="button" aria-label="Toggle dark mode" aria-pressed="false">
                         Off
                     </button>
                 </div>
-
                 <button id="logoutBtn" class="logout-btn" type="button">
                     <i class="fa-solid fa-power-off"></i>
                     <span>Logout</span>
                 </button>
             </div>
         </aside>
-
         <main class="main-content">
-
             <header class="top-bar">
                 <div class="top-bar-heading">
                     <h2>Check Out</h2>
                     <p>Manage active book borrowings</p>
                 </div>
-
                 <div class="top-actions">
                     <div class="admin-profile">
                         <div class="admin-avatar">
                             <i class="fa-solid fa-user"></i>
                         </div>
-
                         <div class="admin-info">
                             <span class="admin-name">Administrator</span>
                             <span class="admin-role">Administrator</span>
@@ -122,84 +95,62 @@
                     </div>
                 </div>
             </header>
-
             <div class="view-container checkout-page">
-
                 <section class="page-heading">
                     <div>
                         <h1>Active Borrowings</h1>
                         <p>Monitor currently borrowed books and their return deadlines.</p>
                     </div>
-
                     <button id="refreshBtn" class="btn-secondary refresh-btn" type="button">
                         <i class="fa-solid fa-rotate"></i>
                         Refresh
                     </button>
                 </section>
-
                 <section class="summary-grid">
-
                     <div class="summary-card">
                         <div class="summary-icon blue">
                             <i class="fa-solid fa-book-open"></i>
                         </div>
-
                         <div class="summary-info">
                             <span>Total Active</span>
                             <h2 id="totalActive">0</h2>
                         </div>
                     </div>
-
                     <div class="summary-card">
                         <div class="summary-icon orange">
                             <i class="fa-solid fa-hourglass-half"></i>
                         </div>
-
                         <div class="summary-info">
                             <span>Borrowed</span>
                             <h2 id="totalBorrowed">0</h2>
                         </div>
                     </div>
-
                     <div class="summary-card">
                         <div class="summary-icon red">
                             <i class="fa-solid fa-triangle-exclamation"></i>
                         </div>
-
                         <div class="summary-info">
                             <span>Overdue</span>
                             <h2 id="totalOverdue">0</h2>
                         </div>
                     </div>
-
                 </section>
-
                 <section class="widget borrowings-card">
-
                     <div class="widget-header table-heading">
                         <div>
                             <h2>Borrowing Records</h2>
                             <p>Records retrieved from the library database.</p>
                         </div>
-
                         <div class="search-box">
                             <i class="fa-solid fa-magnifying-glass"></i>
-                            <input
-                                type="text"
-                                id="borrowSearch"
-                                placeholder="Search student or book..."
-                                aria-label="Search borrowing records"
-                            >
+                            <input type="text" id="borrowSearch" placeholder="Search student or book..." aria-label="Search borrowing records">
                         </div>
                     </div>
-
                     <div id="loadingMessage" class="table-message">
                         <i class="fa-solid fa-spinner fa-spin"></i>
                         Loading borrowing records...
                     </div>
-
                     <div id="errorMessage" class="table-message error-message" hidden></div>
-
                     <div class="table-wrapper">
                         <table>
                             <thead>
@@ -212,7 +163,6 @@
                                     <th>STATUS</th>
                                 </tr>
                             </thead>
-
                             <tbody id="borrowingsTableBody">
                                 <tr>
                                     <td colspan="6" class="empty-cell">
@@ -222,17 +172,12 @@
                             </tbody>
                         </table>
                     </div>
-
                     <div class="table-footer">
                         <span id="recordCount">Showing 0 records</span>
                     </div>
-
                 </section>
-
             </div>
         </main>
-
     </div>
-
 </body>
 </html>

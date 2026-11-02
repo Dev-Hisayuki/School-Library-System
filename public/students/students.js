@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalBorrowers = document.getElementById('totalBorrowers');
     const studentsOnly = document.getElementById('studentsOnly');
 
-    // Custom confirmation modal elements
     const deleteModal = document.getElementById('deleteModal');
     const deleteModalTitle = document.getElementById('deleteModalTitle');
     const deleteModalMessage = document.getElementById('deleteModalMessage');
@@ -34,13 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let messageTimeout;
     let pendingDeleteStudentId = null;
 
-    // ==========================================
-    // DARK MODE
-    // ==========================================
-
     function updateThemeStatus() {
         const isDark = document.body.classList.contains('dark-mode');
-
         if (themeToggleBtn) {
             themeToggleBtn.textContent = isDark ? 'On' : 'Off';
             themeToggleBtn.setAttribute('aria-pressed', String(isDark));
@@ -49,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function applyTheme() {
         const isDark = localStorage.getItem('theme') === 'dark';
-
         document.body.classList.toggle('dark-mode', isDark);
         updateThemeStatus();
     }
@@ -58,25 +51,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     themeToggleBtn?.addEventListener('click', () => {
         const isDark = !document.body.classList.contains('dark-mode');
-
         document.body.classList.toggle('dark-mode', isDark);
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
-
         updateThemeStatus();
     });
-
-    // ==========================================
-    // LOGOUT
-    // ==========================================
 
     document.getElementById('logoutBtn')?.addEventListener('click', () => {
         localStorage.removeItem('authToken');
         window.location.href = '../login/login.html';
     });
-
-    // ==========================================
-    // HTML ESCAPING
-    // ==========================================
 
     function escapeHTML(value) {
         return String(value ?? '').replace(/[&<>"']/g, character => ({
@@ -88,13 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
         })[character]);
     }
 
-    // ==========================================
-    // MESSAGE
-    // ==========================================
-
     function showMessage(message, type = 'success') {
         if (!messageBox) return;
-
         clearTimeout(messageTimeout);
 
         messageBox.textContent = message;
@@ -106,10 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 4000);
     }
 
-    // ==========================================
-    // CUSTOM DELETE MODAL
-    // ==========================================
-
     function openDeleteModal(student) {
         if (!deleteModal) {
             showMessage('Delete confirmation modal is missing from the page.', 'error');
@@ -117,11 +91,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         pendingDeleteStudentId = Number(student.student_id);
-
         deleteModalTitle.textContent = 'Delete Student?';
-
-        deleteModalMessage.textContent =
-            `Are you sure you want to delete ${student.student_name} (${student.student_number})?`;
+        deleteModalMessage.textContent = `Are you sure you want to delete ${student.student_name} (${student.student_number})?`;
 
         confirmDeleteBtn.hidden = false;
         confirmDeleteBtn.disabled = false;
@@ -129,29 +100,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         deleteModal.classList.add('show');
         deleteModal.setAttribute('aria-hidden', 'false');
-
         document.body.classList.add('modal-open');
-
         cancelDeleteBtn?.focus();
     }
 
     function closeDeleteModal() {
         if (!deleteModal) return;
-
         deleteModal.classList.remove('show');
         deleteModal.setAttribute('aria-hidden', 'true');
-
         document.body.classList.remove('modal-open');
-
         pendingDeleteStudentId = null;
     }
 
     function showLinkedRecordsMessage() {
         deleteModalTitle.textContent = 'Student Has Library Records';
-
-        deleteModalMessage.textContent =
-            'This student cannot be permanently deleted because the account is connected to library records, such as borrower registration, borrowing transactions, or fines. Keeping this record protects the library history.';
-
+        deleteModalMessage.textContent = 'This student cannot be permanently deleted because the account is connected to library records, such as borrower registration, borrowing transactions, or fines. Keeping this record protects the library history.';
         confirmDeleteBtn.hidden = true;
         cancelDeleteBtn.textContent = 'Close';
     }
@@ -171,15 +134,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ==========================================
-    // FORM MANAGEMENT
-    // ==========================================
-
     function openForm() {
         registerCard.hidden = false;
-
         document.getElementById('studentNumber').focus();
-
         registerCard.scrollIntoView({
             behavior: 'smooth',
             block: 'start'
@@ -190,47 +147,31 @@ document.addEventListener('DOMContentLoaded', () => {
         registerCard.hidden = true;
         registerForm.reset();
         editingStudentId = null;
-
         formTitle.textContent = 'Register New Student';
-
-        submitBtn.innerHTML =
-            '<i class="fa-solid fa-user-plus"></i> Register Student';
+        submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Register Student';
     }
 
     showRegisterBtn.addEventListener('click', () => {
         editingStudentId = null;
         registerForm.reset();
-
         formTitle.textContent = 'Register New Student';
-
-        submitBtn.innerHTML =
-            '<i class="fa-solid fa-user-plus"></i> Register Student';
-
+        submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Register Student';
         openForm();
     });
 
     cancelRegisterBtn.addEventListener('click', closeForm);
     closeFormBtn.addEventListener('click', closeForm);
 
-    // ==========================================
-    // STUDENT STATISTICS
-    // ==========================================
-
     function updateStatistics() {
         const borrowerCount = students.filter(student =>
             Number(student.is_borrower) === 1
         ).length;
-
         const studentOnlyCount = students.length - borrowerCount;
 
         if (totalStudents) totalStudents.textContent = students.length;
         if (totalBorrowers) totalBorrowers.textContent = borrowerCount;
         if (studentsOnly) studentsOnly.textContent = studentOnlyCount;
     }
-
-    // ==========================================
-    // LOAD STUDENTS
-    // ==========================================
 
     async function loadStudents() {
         tableBody.innerHTML = `
@@ -248,31 +189,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             students = Array.isArray(result.data) ? result.data : [];
-
             updateStatistics();
             filterStudents();
-
         } catch (error) {
             console.error('Load students error:', error);
-
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="8">Unable to load students.</td>
                 </tr>
             `;
-
             studentCount.textContent = '0 students';
             showMessage(error.message, 'error');
         }
     }
 
-    // ==========================================
-    // DISPLAY STUDENTS
-    // ==========================================
-
     function displayStudents(list) {
-        studentCount.textContent =
-            `${list.length} student${list.length === 1 ? '' : 's'}`;
+        studentCount.textContent = `${list.length} student${list.length === 1 ? '' : 's'}`;
 
         if (list.length === 0) {
             tableBody.innerHTML = `
@@ -308,18 +240,15 @@ document.addEventListener('DOMContentLoaded', () => {
                                 class="action-btn edit"
                                 data-action="edit"
                                 data-id="${Number(student.student_id)}"
-                                title="Edit student"
-                            >
+                                title="Edit student">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
-
                             <button
                                 type="button"
                                 class="action-btn delete"
                                 data-action="delete"
                                 data-id="${Number(student.student_id)}"
-                                title="Delete student"
-                            >
+                                title="Delete student">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
@@ -329,13 +258,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
-    // ==========================================
-    // SEARCH
-    // ==========================================
-
     function filterStudents() {
         const search = searchInput.value.toLowerCase().trim();
-
         const filtered = students.filter(student => {
             return [
                 student.student_number,
@@ -348,15 +272,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 String(value || '').toLowerCase().includes(search)
             );
         });
-
         displayStudents(filtered);
     }
 
     searchInput.addEventListener('input', filterStudents);
-
-    // ==========================================
-    // FORM DATA
-    // ==========================================
 
     function getFormData() {
         return {
@@ -368,10 +287,6 @@ document.addEventListener('DOMContentLoaded', () => {
             contact_number: document.getElementById('contactNumber').value.trim()
         };
     }
-
-    // ==========================================
-    // REGISTER / UPDATE STUDENT
-    // ==========================================
 
     registerForm.addEventListener('submit', async event => {
         event.preventDefault();
@@ -385,17 +300,12 @@ document.addEventListener('DOMContentLoaded', () => {
             : API_URL;
 
         submitBtn.disabled = true;
-
-        submitBtn.textContent = isEditing
-            ? 'Saving Changes...'
-            : 'Registering...';
+        submitBtn.textContent = isEditing ? 'Saving Changes...' : 'Registering...';
 
         try {
             const response = await fetch(url, {
                 method: isEditing ? 'PUT' : 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(student)
             });
 
@@ -406,87 +316,48 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             closeForm();
-
             showMessage(
-                result.message || (
-                    isEditing
-                        ? 'Student information updated successfully.'
-                        : 'Student registered successfully.'
-                ),
+                result.message || (isEditing ? 'Student information updated successfully.' : 'Student registered successfully.'),
                 'success'
             );
-
             await loadStudents();
-
         } catch (error) {
             console.error('Save student error:', error);
             showMessage(error.message, 'error');
-
         } finally {
             submitBtn.disabled = false;
-
             submitBtn.innerHTML = editingStudentId !== null
                 ? '<i class="fa-solid fa-floppy-disk"></i> Save Changes'
                 : '<i class="fa-solid fa-user-plus"></i> Register Student';
         }
     });
 
-    // ==========================================
-    // EDIT STUDENT
-    // ==========================================
-
     function editStudent(studentId) {
-        const student = students.find(item =>
-            Number(item.student_id) === Number(studentId)
-        );
-
+        const student = students.find(item => Number(item.student_id) === Number(studentId));
         if (!student) {
             showMessage('Student record not found.', 'error');
             return;
         }
 
         editingStudentId = Number(studentId);
-
-        document.getElementById('studentNumber').value =
-            student.student_number || '';
-
-        document.getElementById('studentName').value =
-            student.student_name || '';
-
-        document.getElementById('email').value =
-            student.email || '';
-
-        document.getElementById('course').value =
-            student.course || '';
-
-        document.getElementById('yearLevel').value =
-            student.year_level || '';
-
-        document.getElementById('contactNumber').value =
-            student.contact_number || '';
+        document.getElementById('studentNumber').value = student.student_number || '';
+        document.getElementById('studentName').value = student.student_name || '';
+        document.getElementById('email').value = student.email || '';
+        document.getElementById('course').value = student.course || '';
+        document.getElementById('yearLevel').value = student.year_level || '';
+        document.getElementById('contactNumber').value = student.contact_number || '';
 
         formTitle.textContent = 'Edit Student Information';
-
-        submitBtn.innerHTML =
-            '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
-
+        submitBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
         openForm();
     }
 
-    // ==========================================
-    // DELETE STUDENT
-    // ==========================================
-
     async function deleteStudent(studentId) {
-        const student = students.find(item =>
-            Number(item.student_id) === Number(studentId)
-        );
-
+        const student = students.find(item => Number(item.student_id) === Number(studentId));
         if (!student) {
             showMessage('Student record not found.', 'error');
             return;
         }
-
         openDeleteModal(student);
     }
 
@@ -494,7 +365,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!pendingDeleteStudentId) return;
 
         const studentId = pendingDeleteStudentId;
-
         confirmDeleteBtn.disabled = true;
         confirmDeleteBtn.textContent = 'Deleting...';
 
@@ -507,7 +377,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!response.ok || !result.success) {
                 const message = result.message || 'Unable to delete student.';
-
                 if (
                     response.status === 409 ||
                     /linked|foreign key|constraint|library records/i.test(message)
@@ -515,24 +384,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     showLinkedRecordsMessage();
                     return;
                 }
-
                 throw new Error(message);
             }
 
             closeDeleteModal();
-
-            showMessage(
-                result.message || 'Student deleted successfully.',
-                'success'
-            );
-
+            showMessage(result.message || 'Student deleted successfully.', 'success');
             await loadStudents();
-
         } catch (error) {
             console.error('Delete student error:', error);
             closeDeleteModal();
             showMessage(error.message, 'error');
-
         } finally {
             if (confirmDeleteBtn) {
                 confirmDeleteBtn.disabled = false;
@@ -543,35 +404,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     confirmDeleteBtn?.addEventListener('click', confirmDeleteStudent);
 
-    // ==========================================
-    // TABLE ACTIONS
-    // ==========================================
-
     tableBody.addEventListener('click', event => {
         const button = event.target.closest('button[data-action]');
-
         if (!button) return;
 
         const studentId = Number(button.dataset.id);
-
         if (button.dataset.action === 'edit') {
             editStudent(studentId);
         }
-
         if (button.dataset.action === 'delete') {
             deleteStudent(studentId);
         }
     });
 
-    // ==========================================
-    // REFRESH
-    // ==========================================
-
     refreshBtn.addEventListener('click', loadStudents);
-
-    // ==========================================
-    // INITIAL LOAD
-    // ==========================================
 
     loadStudents();
 });

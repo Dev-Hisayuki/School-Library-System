@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Library System - Settings</title>
-
+    <title>School Library System - Activity Logs</title>
     <link rel="stylesheet" href="../global.css">
-    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="logs.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="logs.js" defer></script>
 </head>
 <body>
-
     <div class="app-container">
-
         <aside class="sidebar">
             <div class="sidebar-brand">
                 <div class="brand-icon">
@@ -20,64 +18,52 @@
                 </div>
                 <span>School Library</span>
             </div>
-
             <nav class="sidebar-nav">
                 <a href="../dashboard/dashboard.html" class="nav-link">
                     <i class="fa-solid fa-border-all"></i>
                     <span>Dashboard</span>
                 </a>
-
                 <a href="../students/students.html" class="nav-link">
                     <i class="fa-solid fa-user-graduate"></i>
                     <span>Students</span>
                 </a>
-
                 <a href="../borrowers/borrowers.html" class="nav-link">
                     <i class="fa-solid fa-users"></i>
                     <span>Borrowers</span>
                 </a>
-
                 <a href="../books/books.html" class="nav-link">
                     <i class="fa-solid fa-book"></i>
                     <span>Books</span>
                 </a>
-
                 <a href="../categories/categories.html" class="nav-link">
                     <i class="fa-solid fa-layer-group"></i>
                     <span>Categories</span>
                 </a>
-
                 <a href="../publishers/publishers.html" class="nav-link">
                     <i class="fa-solid fa-building"></i>
                     <span>Publishers</span>
                 </a>
-
                 <a href="../issue_book/issue.html" class="nav-link">
                     <i class="fa-solid fa-book-open"></i>
                     <span>Issue Book</span>
                 </a>
-
                 <a href="../check_out/checkout.html" class="nav-link">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                     <span>Check Out</span>
                 </a>
-
                 <a href="../check_in/checkin.html" class="nav-link">
                     <i class="fa-solid fa-arrow-right-to-bracket"></i>
                     <span>Check In</span>
                 </a>
-
-                <a href="../logs/logs.html" class="nav-link">
+                <a href="logs.html" class="nav-link active">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                     <span>Activity Logs</span>
                 </a>
-
-                <a href="settings.html" class="nav-link active">
+                <a href="../settings/settings.html" class="nav-link">
                     <i class="fa-solid fa-gear"></i>
                     <span>Settings</span>
                 </a>
             </nav>
-
             <div class="sidebar-footer">
                 <div class="dark-mode-toggle">
                     <span>Dark Mode</span>
@@ -85,33 +71,31 @@
                         Off
                     </button>
                 </div>
-
                 <button id="logoutBtn" class="logout-btn" type="button">
                     <i class="fa-solid fa-power-off"></i>
                     <span>Logout</span>
                 </button>
             </div>
         </aside>
-
         <main class="main-content">
-
             <header class="top-bar">
                 <div class="top-heading">
-                    <h2>System Settings</h2>
-                    <p>Manage your library system configuration.</p>
+                    <h2>Activity Logs</h2>
+                    <p>Track administrator and system actions.</p>
                 </div>
-
                 <div class="top-actions">
-                    <button class="btn-primary" id="openAddSettingBtn" type="button">
-                        <i class="fa-solid fa-plus"></i>
-                        Add Setting
+                    <button class="btn-secondary" id="refreshLogsBtn" type="button">
+                        <i class="fa-solid fa-rotate"></i>
+                        Refresh
                     </button>
-
+                    <button class="btn-primary" id="exportLogsBtn" type="button">
+                        <i class="fa-solid fa-download"></i>
+                        Export CSV
+                    </button>
                     <div class="admin-profile">
                         <div class="top-admin-avatar">
                             <i class="fa-solid fa-user"></i>
                         </div>
-
                         <div class="admin-info">
                             <span class="admin-name">Administrator</span>
                             <span class="admin-role">System Admin</span>
@@ -119,166 +103,79 @@
                     </div>
                 </div>
             </header>
-
             <div class="view-container">
-
                 <section class="page-heading">
                     <div>
-                        <h1>Settings</h1>
-                        <p>View and manage your library system configuration.</p>
+                        <h1>System Activity Logs</h1>
+                        <p>Monitor real-time system and administrator activities.</p>
                     </div>
                 </section>
-
-                <section class="settings-intro">
-                    <div class="intro-icon">
-                        <i class="fa-solid fa-sliders"></i>
-                    </div>
-
-                    <div>
-                        <h3>Configuration Management</h3>
-                        <p>
-                            View and manage the settings saved in your library database.
-                        </p>
-                    </div>
-                </section>
-
-                <section class="settings-summary">
-
+                <section class="logs-summary">
                     <div class="summary-card">
-                        <div class="summary-info">
-                            <span class="summary-label">TOTAL SETTINGS</span>
-                            <h2 id="totalSettings">0</h2>
-                        </div>
-
                         <div class="summary-icon">
-                            <i class="fa-solid fa-gears"></i>
+                            <i class="fa-solid fa-list-check"></i>
                         </div>
-                    </div>
-
-                    <div class="summary-card">
                         <div class="summary-info">
-                            <span class="summary-label">DATABASE STATUS</span>
-                            <h2 id="databaseStatus">Checking...</h2>
-                        </div>
-
-                        <div class="summary-icon green">
-                            <i class="fa-solid fa-database"></i>
+                            <span>TOTAL LOGS</span>
+                            <h3 id="totalLogs">0</h3>
                         </div>
                     </div>
-
+                    <div class="summary-card">
+                        <div class="summary-icon">
+                            <i class="fa-solid fa-right-to-bracket"></i>
+                        </div>
+                        <div class="summary-info">
+                            <span>LOGIN ACTIONS</span>
+                            <h3 id="loginLogs">0</h3>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <div class="summary-info">
+                            <span>ACTIVE ADMINS</span>
+                            <h3 id="adminCount">0</h3>
+                        </div>
+                    </div>
                 </section>
-
-                <section class="settings-panel widget">
-
-                    <div class="panel-header widget-header">
+                <section class="widget">
+                    <div class="widget-header">
                         <div>
-                            <h3>System Configuration</h3>
-                            <p>All saved settings are stored in your database.</p>
+                            <h3>Audit Trail</h3>
+                            <p>Detailed chronological record of all user events.</p>
                         </div>
-
-                        <button class="btn-secondary" id="refreshSettingsBtn" type="button">
-                            <i class="fa-solid fa-rotate"></i>
-                            Refresh
-                        </button>
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="search" id="logsSearchInput" placeholder="Search activity logs..." autocomplete="off">
+                        </div>
                     </div>
-
-                    <div class="table-wrapper table-responsive">
-                        <table class="settings-table custom-table">
+                    <div class="table-responsive">
+                        <table class="custom-table">
                             <thead>
                                 <tr>
-                                    <th>SETTING KEY</th>
-                                    <th>VALUE</th>
+                                    <th>TIMESTAMP</th>
+                                    <th>ADMINISTRATOR</th>
+                                    <th>ACTION</th>
                                     <th>DESCRIPTION</th>
-                                    <th>LAST UPDATED</th>
-                                    <th>ACTIONS</th>
                                 </tr>
                             </thead>
-
-                            <tbody id="settingsTableBody">
+                            <tbody id="logsTableBody">
                                 <tr>
-                                    <td colspan="5" class="loading-message">
-                                        Loading settings...
+                                    <td colspan="4" class="empty-message">
+                                        <i class="fa-solid fa-spinner fa-spin"></i>
+                                        Loading activity logs...
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-
+                    <div class="table-footer">
+                        <span id="logsCount">Showing 0 activities</span>
+                    </div>
                 </section>
-
             </div>
         </main>
     </div>
-
-    <!-- ADD / EDIT SETTING MODAL -->
-    <div class="modal-overlay" id="settingModal">
-        <div class="modal-card">
-
-            <div class="modal-header">
-                <div>
-                    <h3 id="modalTitle">Add New Setting</h3>
-                    <p>Enter the configuration details below.</p>
-                </div>
-
-                <button class="close-btn" id="closeModalBtn" type="button">
-                    &times;
-                </button>
-            </div>
-
-            <form id="settingForm">
-                <input type="hidden" id="settingId">
-
-                <div class="form-group">
-                    <label for="settingKey">SETTING KEY</label>
-                    <input
-                        type="text"
-                        id="settingKey"
-                        placeholder="e.g. library_name"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="settingValue">SETTING VALUE</label>
-                    <textarea
-                        id="settingValue"
-                        rows="3"
-                        placeholder="Enter setting value"
-                        required
-                    ></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="settingDescription">DESCRIPTION</label>
-                    <textarea
-                        id="settingDescription"
-                        rows="2"
-                        placeholder="Optional description"
-                    ></textarea>
-                </div>
-
-                <div class="modal-actions">
-                    <button
-                        type="button"
-                        class="btn-secondary"
-                        id="cancelModalBtn"
-                    >
-                        Cancel
-                    </button>
-
-                    <button
-                        type="submit"
-                        class="btn-primary"
-                        id="saveSettingBtn"
-                    >
-                        Save Setting
-                    </button>
-                </div>
-            </form>
-
-        </div>
-    </div>
-
-    <script src="settings.js" defer></script>
 </body>
 </html>

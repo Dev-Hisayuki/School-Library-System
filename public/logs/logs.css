@@ -1,7 +1,3 @@
-/* ==========================================
-   ACTIVITY LOGS - PUBLISHERS PAGE STYLE
-========================================== */
-
 * {
     box-sizing: border-box;
 }
@@ -10,20 +6,12 @@ body {
     margin: 0;
 }
 
-/* ==========================================
-   MAIN LAYOUT
-========================================== */
-
 .app-container {
     display: flex;
     width: 100%;
     height: 100vh;
     overflow: hidden;
 }
-
-/* ==========================================
-   SIDEBAR
-========================================== */
 
 .sidebar {
     width: 250px;
@@ -96,10 +84,6 @@ body {
     font-weight: 600;
 }
 
-/* ==========================================
-   SIDEBAR FOOTER
-========================================== */
-
 .sidebar-footer {
     margin-top: auto;
     padding-top: 20px;
@@ -147,10 +131,6 @@ body {
     background: rgba(239, 107, 107, 0.10);
 }
 
-/* ==========================================
-   MAIN CONTENT
-========================================== */
-
 .main-content {
     flex: 1;
     min-width: 0;
@@ -160,10 +140,6 @@ body {
     overflow-y: auto;
     background: var(--bg-main);
 }
-
-/* ==========================================
-   TOP BAR
-========================================== */
 
 .top-bar {
     min-height: 75px;
@@ -234,10 +210,6 @@ body {
     font-size: 0.7rem;
 }
 
-/* ==========================================
-   BUTTONS
-========================================== */
-
 .btn-primary,
 .btn-secondary {
     min-height: 38px;
@@ -274,18 +246,10 @@ body {
     background: var(--border-color);
 }
 
-/* ==========================================
-   VIEW CONTAINER
-========================================== */
-
 .view-container {
     width: 100%;
     padding: 30px;
 }
-
-/* ==========================================
-   PAGE HEADING
-========================================== */
 
 .page-heading {
     display: flex;
@@ -307,10 +271,6 @@ body {
     color: var(--text-muted);
     font-size: 0.85rem;
 }
-
-/* ==========================================
-   SUMMARY CARDS
-========================================== */
 
 .logs-summary {
     display: grid;
@@ -362,10 +322,6 @@ body {
     font-weight: 700;
 }
 
-/* ==========================================
-   ACTIVITY TABLE WIDGET
-========================================== */
-
 .widget {
     margin-bottom: 25px;
     padding: 20px;
@@ -395,10 +351,6 @@ body {
     color: var(--text-muted);
     font-size: 0.8rem;
 }
-
-/* ==========================================
-   SEARCH
-========================================== */
 
 .search-box {
     width: 280px;
@@ -431,10 +383,6 @@ body {
 .search-box input::placeholder {
     color: var(--text-muted);
 }
-
-/* ==========================================
-   ACTIVITY TABLE
-========================================== */
 
 .table-responsive {
     width: 100%;
@@ -483,10 +431,6 @@ body {
     border-bottom: none;
 }
 
-/* ==========================================
-   ADMINISTRATOR DETAILS
-========================================== */
-
 .admin-cell {
     display: flex;
     align-items: center;
@@ -522,10 +466,6 @@ body {
     color: var(--text-muted);
     font-size: 0.73rem;
 }
-
-/* ==========================================
-   ACTION BADGES
-========================================== */
 
 .badge-tag {
     display: inline-block;
@@ -567,20 +507,12 @@ body {
     color: var(--text-muted);
 }
 
-/* ==========================================
-   DESCRIPTION
-========================================== */
-
 .description-cell {
     min-width: 220px;
     max-width: 450px;
     line-height: 1.5;
     overflow-wrap: anywhere;
 }
-
-/* ==========================================
-   EMPTY / LOADING STATES
-========================================== */
 
 .empty-message {
     padding: 35px 20px !important;
@@ -594,10 +526,6 @@ body {
     font-size: 1.5rem;
 }
 
-/* ==========================================
-   TABLE FOOTER
-========================================== */
-
 .table-footer {
     padding: 14px 0 0;
     margin-top: 5px;
@@ -605,10 +533,6 @@ body {
     color: var(--text-muted);
     font-size: 0.78rem;
 }
-
-/* ==========================================
-   RESPONSIVE DESIGN
-========================================== */
 
 @media (max-width: 1100px) {
     .top-bar {
