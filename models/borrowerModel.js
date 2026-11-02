@@ -1,4 +1,3 @@
-
 const db = require('../config/db');
 
 // Get all borrowers with their student information
@@ -7,7 +6,10 @@ const getAllBorrowers = async () => {
         SELECT
             b.borrower_id,
             b.student_id,
-            s.student_name
+            s.student_number,
+            s.student_name,
+            s.course,
+            s.year_level
         FROM borrowers b
         INNER JOIN students s
             ON b.student_id = s.student_id
@@ -31,4 +33,3 @@ module.exports = {
     getAllBorrowers,
     createBorrower
 };
-

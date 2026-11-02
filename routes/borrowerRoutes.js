@@ -1,14 +1,11 @@
-
 const express = require('express');
 const router = express.Router();
 
 const borrowerController = require('../controllers/borrowerController');
 
-// GET /api/borrowers
-router.get('/', borrowerController.getAllBorrowers);
+console.log('BORROWER ROUTES LOADED');
 
-// POST /api/borrowers
+router.get('/', borrowerController.getAllBorrowers);
 router.post('/', borrowerController.createBorrower);
 
 module.exports = router;
-

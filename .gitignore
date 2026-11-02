@@ -1,2 +1,5 @@
 node_modules/
 .env
+school_library_system.sql
+school_library_system_backup.sql
+models/dashboardModel.frontend-backup.js

@@ -1,134 +1,316 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Library System - Borrowers</title>
+    <title>Borrowers | Library Management System</title>
 
     <link rel="stylesheet" href="../global.css">
     <link rel="stylesheet" href="borrowers.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <script src="borrowers.js" defer></script>
 </head>
+
 <body>
 
-    <aside class="sidebar">
-        <div class="brand">
-            <div class="brand-icon"><i class="fa-solid fa-book-bookmark"></i></div>
-            <span class="brand-name">School Library System</span>
-            <span class="version-tag">v2.4</span>
-        </div>
+    <div class="app-container">
 
-        <div class="user-profile-card">
-            <div class="avatar-wrapper">
-                <div class="avatar-placeholder">LS</div>
-                <span class="status-indicator"></span>
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="sidebar-brand">
+                <i class="fa-solid fa-book-bookmark"></i>
+                <span>Library System</span>
             </div>
-            <div class="user-info">
-                <div class="user-name">Library Staff</div>
-                <div class="user-role">Library Management</div>
-            </div>
-        </div>
 
-        <nav class="nav-menu">
-            <a href="../dashboard/dashboard.html" class="nav-link">
-                <i class="fa-solid fa-border-all"></i><span>Dashboard</span>
-            </a>
-            <a href="../borrowers/borrowers.html" class="nav-link active">
-                <i class="fa-solid fa-users"></i><span>Borrowers</span>
-            </a>
-            <a href="../issue_book/issue.html" class="nav-link">
-                <i class="fa-solid fa-book-open"></i><span>Issue Book</span>
-            </a>
-            <a href="../check_in/checkin.html" class="nav-link">
-                <i class="fa-solid fa-arrow-right-to-bracket"></i><span>Check In</span>
-            </a>
-            <a href="../logs/logs.html" class="nav-link">
-                <i class="fa-solid fa-clock-rotate-left"></i><span>Logs</span>
-            </a>
-        </nav>
+            <nav class="sidebar-nav">
 
-        <div class="sidebar-footer">
-            <div class="dark-mode-toggle">
-                <span>Dark Mode</span>
-                <button id="themeToggleBtn" class="toggle-switch">Toggle</button>
-            </div>
-            <button id="logoutBtn" class="logout-btn">
-                <i class="fa-solid fa-power-off"></i> Logout
-            </button>
-        </div>
-    </aside>
+                <a href="../dashboard/dashboard.html" class="nav-link">
+                    <i class="fa-solid fa-border-all"></i>
+                    <span>Dashboard</span>
+                </a>
 
-    <main class="main-content">
-        <header class="top-bar">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" placeholder="Search borrowers...">
-            </div>
-        </header>
+                <a href="../students/students.html" class="nav-link">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <span>Students</span>
+                </a>
 
-        <div class="view-container">
-            <div class="page-heading">
-                <div>
-                    <h1>Borrowers</h1>
-                    <p>Manage students registered to borrow library books.</p>
+                <a href="../borrowers/borrowers.html" class="nav-link active">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Borrowers</span>
+                </a>
+
+                <a href="../books/books.html" class="nav-link">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>Books</span>
+                </a>
+
+                <a href="../categories/categories.html" class="nav-link">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>Categories</span>
+                </a>
+
+                <a href="../publishers/publishers.html" class="nav-link">
+                    <i class="fa-solid fa-building"></i>
+                    <span>Publishers</span>
+                </a>
+
+                <a href="../issue_book/issue.html" class="nav-link">
+                    <i class="fa-solid fa-book"></i>
+                    <span>Issue Book</span>
+                </a>
+
+                <a href="../check_out/checkout.html" class="nav-link">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Check Out</span>
+                </a>
+
+                <a href="../check_in/checkin.html" class="nav-link">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <span>Check In</span>
+                </a>
+
+                <a href="../logs/logs.html" class="nav-link">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>Activity Logs</span>
+                </a>
+
+                <a href="../settings/settings.html" class="nav-link">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span>
+                </a>
+
+            </nav>
+
+            <div class="sidebar-footer">
+
+                <div class="dark-mode-toggle">
+                    <span>Dark Mode</span>
+
+                    <button
+                        id="themeToggleBtn"
+                        class="toggle-switch"
+                        type="button"
+                        aria-pressed="false">
+                        Off
+                    </button>
                 </div>
-                <button id="showRegisterBtn" class="btn-primary">
-                    <i class="fa-solid fa-user-plus"></i> Register Borrower
+
+                <button id="logoutBtn" class="logout-btn" type="button">
+                    <i class="fa-solid fa-power-off"></i>
+                    Logout
                 </button>
+
             </div>
 
-            <div id="messageBox" class="message-box"></div>
+        </aside>
 
-            <section id="registerCard" class="form-card" hidden>
-                <h2>Register New Borrower</h2>
-                <p>Enter the existing student ID to register the student.</p>
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
 
-                <form id="registerForm">
-                    <div class="form-group">
-                        <label for="studentId">STUDENT ID</label>
-                        <input type="number" id="studentId" min="1"
-                               placeholder="Enter student ID" required>
+            <!-- TOPBAR -->
+            <header class="top-bar">
+
+                <div>
+                    <h2>Borrowers</h2>
+                    <p>Manage students registered in your library</p>
+                </div>
+
+                <div class="top-actions">
+
+                    <div class="admin-profile">
+
+                        <div class="admin-avatar">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+
+                        <div class="admin-info">
+                            <span class="admin-name">Administrator</span>
+                            <span class="admin-role">System Admin</span>
+                        </div>
+
                     </div>
-                    <button type="submit" class="btn-primary">
-                        Register Student
-                    </button>
-                    <button type="button" id="cancelRegisterBtn" class="btn-secondary">
-                        Cancel
-                    </button>
-                </form>
-            </section>
 
-            <section class="table-card">
-                <div class="table-heading">
+                </div>
+
+            </header>
+
+            <!-- PAGE CONTENT -->
+            <section class="view-container borrower-page">
+
+                <div class="page-heading">
+
                     <div>
-                        <h2>Registered Borrowers</h2>
-                        <p>Students currently registered in the library.</p>
+                        <h1>Borrower Management</h1>
+                        <p>Manage students registered to borrow library books.</p>
                     </div>
-                    <button id="refreshBtn" class="btn-secondary">
-                        <i class="fa-solid fa-rotate"></i> Refresh
+
+                    <button
+                        type="button"
+                        class="btn-primary"
+                        id="showRegisterBtn">
+                        <i class="fa-solid fa-user-plus"></i>
+                        Register Borrower
                     </button>
+
                 </div>
 
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Borrower ID</th>
-                                <th>Student ID</th>
-                                <th>Student Name</th>
-                            </tr>
-                        </thead>
-                        <tbody id="borrowerTableBody">
-                            <tr>
-                                <td colspan="3">Loading borrowers...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <!-- MESSAGE -->
+                <div id="messageBox" class="message-box" role="status"></div>
+
+                <!-- REGISTER BORROWER FORM -->
+                <section id="registerCard" class="widget register-card" hidden>
+
+                    <div class="widget-header">
+                        <div>
+                            <h2>Register New Borrower</h2>
+                            <p>Select an existing student to register as a library borrower.</p>
+                        </div>
+                    </div>
+
+                    <form id="registerForm">
+
+                        <div class="form-group">
+                            <label for="studentSelect">Select Student</label>
+
+                            <select id="studentSelect" required>
+                                <option value="">Loading students...</option>
+                            </select>
+                        </div>
+
+                        <div
+                            id="selectedStudentDetails"
+                            class="selected-student-details"
+                            hidden>
+
+                            <h3>Selected Student Information</h3>
+
+                            <div class="student-detail-grid">
+
+                                <div class="student-detail-item">
+                                    <span>Student ID</span>
+                                    <strong id="selectedStudentId">—</strong>
+                                </div>
+
+                                <div class="student-detail-item">
+                                    <span>Student Number</span>
+                                    <strong id="selectedStudentNumber">—</strong>
+                                </div>
+
+                                <div class="student-detail-item">
+                                    <span>Full Name</span>
+                                    <strong id="selectedStudentName">—</strong>
+                                </div>
+
+                                <div class="student-detail-item">
+                                    <span>Course</span>
+                                    <strong id="selectedStudentCourse">—</strong>
+                                </div>
+
+                                <div class="student-detail-item">
+                                    <span>Year Level</span>
+                                    <strong id="selectedStudentYear">—</strong>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-actions">
+
+                            <button
+                                type="submit"
+                                id="registerSubmitBtn"
+                                class="btn-primary">
+                                <i class="fa-solid fa-user-plus"></i>
+                                Register Borrower
+                            </button>
+
+                            <button
+                                type="button"
+                                id="cancelRegisterBtn"
+                                class="btn-secondary">
+                                Cancel
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </section>
+
+                <!-- BORROWER RECORDS -->
+                <div class="widget table-card">
+
+                    <div class="widget-header">
+
+                        <div>
+                            <h2>Registered Borrowers</h2>
+                            <p>View and manage students currently registered in the library.</p>
+                        </div>
+
+                        <div class="borrower-table-actions">
+
+                            <div class="search-box">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+
+                                <input
+                                    type="search"
+                                    id="searchInput"
+                                    placeholder="Search borrowers..."
+                                    autocomplete="off">
+                            </div>
+
+                            <button
+                                id="refreshBtn"
+                                class="btn-secondary"
+                                type="button">
+                                <i class="fa-solid fa-rotate"></i>
+                                Refresh
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Borrower ID</th>
+                                    <th>Student ID</th>
+                                    <th>Student Number</th>
+                                    <th>Student Name</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="borrowerTableBody">
+                                <tr>
+                                    <td colspan="4" class="table-message">
+                                        Loading borrowers...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                    <div class="table-footer">
+                        <span id="borrowerCount">Registered borrowers</span>
+                    </div>
+
                 </div>
+
             </section>
-        </div>
-    </main>
 
-    <script src="borrowers.js"></script>
+        </main>
+
+    </div>
+
 </body>
 </html>

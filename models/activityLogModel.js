@@ -1,22 +1,43 @@
 const db = require('../config/db');
 
 const ActivityLog = {
-  create: async (userId, action, description) => {
-    const sql = `INSERT INTO activity_logs (user_id, action, description, created_at) VALUES (?, ?, ?, NOW())`;
-    const [result] = await db.execute(sql, [userId, action, description]);
-    return result;
-  },
+    // Create a new activity log
+    create: async (adminId, action, description) => {
+        const sql = `
+            INSERT INTO activity_logs
+                (admin_id, action, description)
+            VALUES (?, ?, ?)
+        `;
 
-  getAll: async () => {
-    const sql = `
-      SELECT al.id, al.action, al.description, al.created_at, u.username 
-      FROM activity_logs al
-      LEFT JOIN users u ON al.user_id = u.id
-      ORDER BY al.created_at DESC
-    `;
-    const [rows] = await db.execute(sql);
-    return rows;
-  }
+        const [result] = await db.execute(sql, [
+            adminId || null,
+            action,
+            description
+        ]);
+
+        return result;
+    },
+
+    // Retrieve all activity logs with administrator information
+    getAll: async () => {
+        const sql = `
+            SELECT
+                al.id,
+                al.admin_id,
+                a.full_name AS admin_name,
+                a.username,
+                al.action,
+                al.description,
+                al.created_at
+            FROM activity_logs AS al
+            LEFT JOIN admins AS a
+                ON al.admin_id = a.id
+            ORDER BY al.created_at DESC, al.id DESC
+        `;
+
+        const [rows] = await db.execute(sql);
+        return rows;
+    }
 };
 
 module.exports = ActivityLog;

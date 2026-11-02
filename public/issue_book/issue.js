@@ -5,43 +5,88 @@ document.addEventListener('DOMContentLoaded', () => {
     const issueBtn = document.getElementById('issueBtn');
     const messageBox = document.getElementById('messageBox');
 
-    if (localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-mode');
+    // DARK MODE
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+
+    function applyTheme() {
+        const isDarkMode = localStorage.getItem('theme') === 'dark';
+
+        document.body.classList.toggle('dark-mode', isDarkMode);
+
+        if (themeToggleBtn) {
+            themeToggleBtn.textContent = isDarkMode ? 'On' : 'Off';
+        }
     }
 
-    document.getElementById('themeToggleBtn').addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
+    applyTheme();
 
-        localStorage.setItem(
-            'theme',
-            document.body.classList.contains('dark-mode') ? 'dark' : 'light'
-        );
-    });
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+            const isDarkMode = document.body.classList.contains('dark-mode');
 
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-        localStorage.removeItem('authToken');
-        window.location.href = '../login/login.html';
-    });
+            localStorage.setItem('theme', isDarkMode ? 'light' : 'dark');
+            applyTheme();
+        });
+    }
 
+    // LOGOUT
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            window.location.href = '../login/login.html';
+        });
+    }
+
+    // DISPLAY MESSAGES
     function showMessage(message, type) {
+        if (!messageBox) return;
+
         messageBox.textContent = message;
         messageBox.className = `message-box ${type}`;
         messageBox.hidden = false;
     }
 
+    // FORMAT API DATE
+    function formatDate(dateValue) {
+        if (!dateValue) return 'Not available';
+
+        const date = new Date(dateValue);
+
+        if (Number.isNaN(date.getTime())) {
+            return 'Not available';
+        }
+
+        return date.toLocaleDateString('en-PH', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            timeZone: 'Asia/Manila'
+        });
+    }
+
+    // LOAD REGISTERED BORROWERS
     async function loadStudents() {
         try {
+            studentSelect.innerHTML =
+                '<option value="">Loading students...</option>';
+
             const response = await fetch('/api/borrowers');
             const result = await response.json();
 
             if (!response.ok || !result.success) {
-                throw new Error('Failed to load registered students.');
+                throw new Error(
+                    result.message || 'Failed to load registered students.'
+                );
             }
+
+            const students = Array.isArray(result.data) ? result.data : [];
 
             studentSelect.innerHTML =
                 '<option value="">Choose a student</option>';
 
-            result.data.forEach(student => {
+            students.forEach(student => {
                 const option = document.createElement('option');
 
                 option.value = student.student_id;
@@ -51,7 +96,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 studentSelect.appendChild(option);
             });
 
+            if (students.length === 0) {
+                studentSelect.innerHTML =
+                    '<option value="">No registered borrowers found</option>';
+            }
+
         } catch (error) {
+            console.error('Student loading error:', error);
+
             studentSelect.innerHTML =
                 '<option value="">Unable to load students</option>';
 
@@ -59,19 +111,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // LOAD AVAILABLE BOOKS
     async function loadBooks() {
         try {
+            bookSelect.innerHTML =
+                '<option value="">Loading books...</option>';
+
             const response = await fetch('/api/books');
             const result = await response.json();
 
             if (!response.ok || !result.success) {
-                throw new Error('Failed to load books.');
+                throw new Error(
+                    result.message || 'Failed to load books.'
+                );
             }
+
+            const books = Array.isArray(result.data) ? result.data : [];
 
             bookSelect.innerHTML =
                 '<option value="">Choose a book</option>';
 
-            result.data.forEach(book => {
+            books.forEach(book => {
                 const option = document.createElement('option');
 
                 option.value = book.book_id;
@@ -81,12 +141,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (Number(book.available_copies) <= 0) {
                     option.disabled = true;
+                    option.textContent =
+                        `${book.book_title} (Unavailable)`;
                 }
 
                 bookSelect.appendChild(option);
             });
 
+            if (books.length === 0) {
+                bookSelect.innerHTML =
+                    '<option value="">No books found</option>';
+            }
+
         } catch (error) {
+            console.error('Book loading error:', error);
+
             bookSelect.innerHTML =
                 '<option value="">Unable to load books</option>';
 
@@ -94,58 +163,70 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    issueForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
+    // SUBMIT BORROWING TRANSACTION
+    if (issueForm) {
+        issueForm.addEventListener('submit', async event => {
+            event.preventDefault();
 
-        const studentId = studentSelect.value;
-        const bookId = bookSelect.value;
-        const dueDate = document.getElementById('dueDate').value;
+            messageBox.hidden = true;
 
-        if (!studentId || !bookId || !dueDate) {
-            showMessage('Please complete all fields.', 'error');
-            return;
-        }
+            const studentId = studentSelect.value;
+            const bookId = bookSelect.value;
 
-        issueBtn.disabled = true;
-        issueBtn.textContent = 'Processing...';
-
-        try {
-            const response = await fetch('/api/borrows', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    student_id: Number(studentId),
-                    book_id: Number(bookId),
-                    due_date: dueDate
-                })
-            });
-
-            const result = await response.json();
-
-            if (!response.ok || !result.success) {
-                throw new Error(result.message || 'Failed to issue book.');
+            if (!studentId || !bookId) {
+                showMessage(
+                    'Please select a student and a book.',
+                    'error'
+                );
+                return;
             }
 
-            showMessage(
-                `Book issued successfully! Borrow ID: ${result.borrow_id}`,
-                'success'
-            );
-
-            issueForm.reset();
-            await loadBooks();
-
-        } catch (error) {
-            showMessage(error.message, 'error');
-
-        } finally {
-            issueBtn.disabled = false;
+            issueBtn.disabled = true;
             issueBtn.innerHTML =
-                '<i class="fas fa-check-circle"></i> Issue Book';
-        }
-    });
+                '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
+            try {
+                const response = await fetch('/api/borrows', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        student_id: Number(studentId),
+                        book_id: Number(bookId)
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok || !result.success) {
+                    throw new Error(
+                        result.message || 'Failed to issue book.'
+                    );
+                }
+
+                showMessage(
+                    `Book issued successfully! Borrow ID: ${result.borrow_id}. Due date: ${formatDate(result.due_date)}.`,
+                    'success'
+                );
+
+                issueForm.reset();
+
+                await loadBooks();
+
+            } catch (error) {
+                console.error('Issue book error:', error);
+                showMessage(error.message, 'error');
+
+            } finally {
+                issueBtn.disabled = false;
+                issueBtn.innerHTML =
+                    '<i class="fas fa-check-circle"></i> Issue Book';
+            }
+        });
+    }
+
+    // INITIAL LOADING
     loadStudents();
     loadBooks();
 });
