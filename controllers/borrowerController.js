@@ -1,6 +1,5 @@
 const borrowerModel = require('../models/borrowerModel');
 
-// GET /api/borrowers
 const getAllBorrowers = async (req, res) => {
     try {
         const borrowers = await borrowerModel.getAllBorrowers();
@@ -19,7 +18,6 @@ const getAllBorrowers = async (req, res) => {
     }
 };
 
-// POST /api/borrowers
 const createBorrower = async (req, res) => {
     try {
         const { student_id } = req.body;

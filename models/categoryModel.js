@@ -2,7 +2,6 @@
 const db = require('../config/db');
 
 class CategoryModel {
-    // Get all categories with their total number of books
     static async getAllCategories() {
         const [rows] = await db.query(`
             SELECT
@@ -25,7 +24,6 @@ class CategoryModel {
         return rows;
     }
 
-    // Get one category
     static async getCategoryById(id) {
         const [rows] = await db.query(
             `SELECT
@@ -49,7 +47,6 @@ class CategoryModel {
         return rows[0] || null;
     }
 
-    // Create category
     static async createCategory(categoryName, description) {
         const [result] = await db.query(
             'INSERT INTO categories (category_name, description) VALUES (?, ?)',
@@ -59,7 +56,6 @@ class CategoryModel {
         return result.insertId;
     }
 
-    // Update category
     static async updateCategory(id, categoryName, description) {
         const [result] = await db.query(
             `UPDATE categories
@@ -71,7 +67,6 @@ class CategoryModel {
         return result.affectedRows;
     }
 
-    // Delete category
     static async deleteCategory(id) {
         const [result] = await db.query(
             'DELETE FROM categories WHERE category_id = ?',

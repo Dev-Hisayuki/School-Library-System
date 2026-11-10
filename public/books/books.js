@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', () => {
     const API = {
         books: '/api/books',
@@ -56,9 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let publishers = [];
     let editingBookId = null;
 
-    // =========================================
-    // CATEGORY MANAGER STYLES
-    // =========================================
+
 
     const categoryStyles = document.createElement('style');
 
@@ -195,9 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.head.appendChild(categoryStyles);
 
-    // =========================================
-    // API REQUEST
-    // =========================================
+
 
     async function request(url, options = {}) {
         const response = await fetch(url, {
@@ -223,9 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return result;
     }
 
-    // =========================================
-    // LOAD PAGE DATA
-    // =========================================
+
 
     async function loadPageData() {
         try {
@@ -315,9 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // =========================================
-    // BOOK TABLE
-    // =========================================
+
 
     function renderBooks() {
         if (!elements.tableBody) return;
@@ -403,10 +396,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button
                                 type="button"
                                 class="action-btn delete"
-                                title="Delete Book"
+                                title="Archive Book"
                                 data-action="delete"
                                 data-id="${book.book_id}">
-                                <i class="fa-solid fa-trash"></i>
+                                <i class="fa-solid fa-box-archive"></i>
                             </button>
                         </div>
                     </td>
@@ -436,9 +429,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // =========================================
-    // BOOK STATISTICS
-    // =========================================
+
 
     function updateStatistics() {
         const totalTitles = books.length;
@@ -475,9 +466,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // =========================================
-    // BOOK MODAL
-    // =========================================
+
 
     function openModal(book = null) {
         if (!elements.modal || !elements.form) return;
@@ -552,9 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
         editingBookId = null;
     }
 
-    // =========================================
-    // SAVE BOOK
-    // =========================================
+
 
     async function saveBook(event) {
         event.preventDefault();
@@ -654,9 +641,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // =========================================
-    // EDIT BOOK
-    // =========================================
+
 
     function editBook(bookId) {
         const book = books.find(
@@ -671,9 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal(book);
     }
 
-    // =========================================
-    // DELETE BOOK
-    // =========================================
+
 
     async function deleteBook(bookId) {
         const book = books.find(
@@ -686,9 +669,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const confirmed = await showConfirmDialog(
-            'Delete Book?',
-            `Are you sure you want to delete "${book.title}"? This action cannot be undone.`,
-            'Delete Book'
+            'Archive Book?',
+            `Are you sure you want to archive "${book.title}"? It will be removed from the active catalog, but its borrowing and return history will be preserved.`,
+            'Archive Book'
         );
 
         if (!confirmed) return;
@@ -699,17 +682,16 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             await loadBooksOnly();
-            showMessage('Book deleted successfully.', 'success');
+
+            showMessage('Book archived successfully.', 'success');
 
         } catch (error) {
-            console.error('Delete book error:', error);
+            console.error('Archive book error:', error);
             showMessage(error.message, 'error');
         }
     }
 
-    // =========================================
-    // CATEGORY MODAL
-    // =========================================
+
 
     async function openCategoryManager() {
         if (!elements.categoryModal) return;
@@ -748,9 +730,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.cancelCategoryEditButton.textContent = 'Clear';
     }
 
-    // =========================================
-    // CATEGORY TABLE
-    // =========================================
+
 
     function renderCategories() {
         if (!elements.categoryTableBody) return;
@@ -806,9 +786,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
-    // =========================================
-    // ADD / UPDATE CATEGORY
-    // =========================================
+
 
     async function saveCategory(event) {
         event.preventDefault();
@@ -881,9 +859,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // =========================================
-    // EDIT CATEGORY
-    // =========================================
+
 
     function editCategory(categoryId) {
         const category = categories.find(
@@ -908,9 +884,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hideCategoryMessage();
     }
 
-    // =========================================
-    // DELETE CATEGORY
-    // =========================================
+
 
     async function deleteCategory(categoryId) {
         const category = categories.find(
@@ -948,9 +922,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // =========================================
-    // CUSTOM CONFIRM DIALOG
-    // =========================================
+
 
     function showConfirmDialog(title, message, confirmText = 'Confirm') {
         return new Promise(resolve => {
@@ -1005,9 +977,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // =========================================
-    // TOAST NOTIFICATIONS
-    // =========================================
+
 
     function showMessage(message, type = 'success') {
         if (!elements.message) return;
@@ -1058,9 +1028,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.categoryMessage.style.display = 'none';
     }
 
-    // =========================================
-    // THEME
-    // =========================================
+
 
     function updateThemeButton(isDark) {
         if (!elements.themeButton) return;
@@ -1088,9 +1056,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateThemeButton(isDark);
     }
 
-    // =========================================
-    // LOGOUT
-    // =========================================
+
 
     async function logout() {
         const confirmed = await showConfirmDialog(
@@ -1108,9 +1074,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = '../login/login.html';
     }
 
-    // =========================================
-    // HTML ESCAPING
-    // =========================================
+
 
     function escapeHTML(value) {
         return String(value ?? '').replace(/[&<>"']/g, character => {
@@ -1126,9 +1090,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // =========================================
-    // EVENT LISTENERS
-    // =========================================
+
 
     elements.addButton?.addEventListener('click', () => openModal());
 
@@ -1162,7 +1124,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // CATEGORY MANAGER EVENTS
 
     elements.manageCategoriesButton?.addEventListener(
         'click',
@@ -1207,9 +1168,7 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.themeButton?.addEventListener('click', toggleTheme);
     elements.logoutButton?.addEventListener('click', logout);
 
-    // =========================================
-    // INITIALIZE
-    // =========================================
+
 
     applyTheme();
     loadPageData();

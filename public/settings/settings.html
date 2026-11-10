@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,8 +7,10 @@
     <title>School Library System - Settings</title>
 
     <link rel="stylesheet" href="../global.css">
-    <link rel="stylesheet" href="settings.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="settings.css">
+
+    <script src="/js/auth.js"></script>
 </head>
 <body>
 
@@ -81,7 +84,12 @@
             <div class="sidebar-footer">
                 <div class="dark-mode-toggle">
                     <span>Dark Mode</span>
-                    <button id="themeToggleBtn" class="toggle-switch" type="button">
+                    <button
+                        id="themeToggleBtn"
+                        class="toggle-switch"
+                        type="button"
+                        aria-pressed="false"
+                    >
                         Off
                     </button>
                 </div>

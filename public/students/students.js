@@ -1,5 +1,7 @@
+
 document.addEventListener('DOMContentLoaded', () => {
     const API_URL = '/api/students';
+    const FINES_API_URL = '/api/fines';
 
     const tableBody = document.getElementById('studentTableBody');
     const registerForm = document.getElementById('registerForm');
@@ -21,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalBorrowers = document.getElementById('totalBorrowers');
     const studentsOnly = document.getElementById('studentsOnly');
 
-    // Custom confirmation modal elements
     const deleteModal = document.getElementById('deleteModal');
     const deleteModalTitle = document.getElementById('deleteModalTitle');
     const deleteModalMessage = document.getElementById('deleteModalMessage');
@@ -29,14 +30,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
     const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
 
+    // FINES ELEMENTS
+    const finesModal = document.getElementById('finesModal');
+    const closeFinesModalBtn = document.getElementById('closeFinesModalBtn');
+    const closeFinesFooterBtn = document.getElementById('closeFinesFooterBtn');
+
+    const finesStudentInfo = document.getElementById('finesStudentInfo');
+    const finesTotalAmount = document.getElementById('finesTotalAmount');
+    const finesTotalPaid = document.getElementById('finesTotalPaid');
+    const finesTotalBalance = document.getElementById('finesTotalBalance');
+
+    const finesTableBody = document.getElementById('finesTableBody');
+    const paymentHistoryBody = document.getElementById('paymentHistoryBody');
+
+    const finePaymentSection = document.getElementById('finePaymentSection');
+    const selectedFineInfo = document.getElementById('selectedFineInfo');
+
+    const paymentForm = document.getElementById('paymentForm');
+    const paymentAmount = document.getElementById('paymentAmount');
+    const paymentMethod = document.getElementById('paymentMethod');
+    const paymentMessage = document.getElementById('paymentMessage');
+    const submitPaymentBtn = document.getElementById('submitPaymentBtn');
+    const cancelPaymentBtn = document.getElementById('cancelPaymentBtn');
+
     let students = [];
     let editingStudentId = null;
     let messageTimeout;
     let pendingDeleteStudentId = null;
 
-    // ==========================================
-    // DARK MODE
-    // ==========================================
+    let currentFinesStudent = null;
+    let currentFines = [];
+    let selectedFine = null;
+    let paymentMessageTimeout;
+
+
 
     function updateThemeStatus() {
         const isDark = document.body.classList.contains('dark-mode');
@@ -65,18 +92,14 @@ document.addEventListener('DOMContentLoaded', () => {
         updateThemeStatus();
     });
 
-    // ==========================================
-    // LOGOUT
-    // ==========================================
+
 
     document.getElementById('logoutBtn')?.addEventListener('click', () => {
         localStorage.removeItem('authToken');
         window.location.href = '../login/login.html';
     });
 
-    // ==========================================
-    // HTML ESCAPING
-    // ==========================================
+
 
     function escapeHTML(value) {
         return String(value ?? '').replace(/[&<>"']/g, character => ({
@@ -88,9 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })[character]);
     }
 
-    // ==========================================
-    // MESSAGE
-    // ==========================================
+
 
     function showMessage(message, type = 'success') {
         if (!messageBox) return;
@@ -106,13 +127,505 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 4000);
     }
 
-    // ==========================================
-    // CUSTOM DELETE MODAL
-    // ==========================================
+    function showPaymentMessage(message, type = 'success') {
+        if (!paymentMessage) return;
+
+        clearTimeout(paymentMessageTimeout);
+
+        paymentMessage.textContent = message;
+        paymentMessage.className = `message-box ${type}`;
+
+        paymentMessageTimeout = window.setTimeout(() => {
+            paymentMessage.className = 'message-box';
+            paymentMessage.textContent = '';
+        }, 4000);
+    }
+
+
+
+    function formatCurrency(value) {
+        const amount = Number(value) || 0;
+
+        return new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP'
+        }).format(amount);
+    }
+
+    function formatDate(value) {
+        if (!value) return '—';
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return escapeHTML(value);
+        }
+
+        return date.toLocaleDateString('en-PH', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    }
+
+
+
+    function openFinesModal() {
+        finesModal.classList.add('show');
+        finesModal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-open');
+    }
+
+    function closeFinesModal() {
+        if (!finesModal) return;
+
+        finesModal.classList.remove('show');
+        finesModal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-open');
+
+        currentFinesStudent = null;
+        currentFines = [];
+        selectedFine = null;
+
+        paymentForm?.reset();
+
+        if (finePaymentSection) {
+            finePaymentSection.hidden = true;
+        }
+
+        if (paymentMessage) {
+            paymentMessage.textContent = '';
+            paymentMessage.className = 'message-box';
+        }
+    }
+
+    closeFinesModalBtn?.addEventListener('click', closeFinesModal);
+    closeFinesFooterBtn?.addEventListener('click', closeFinesModal);
+
+    finesModal?.addEventListener('click', event => {
+        if (event.target === finesModal) {
+            closeFinesModal();
+        }
+    });
+
+
+
+    async function openStudentFines(studentId) {
+        const student = students.find(item =>
+            Number(item.student_id) === Number(studentId)
+        );
+
+        if (!student) {
+            showMessage('Student record not found.', 'error');
+            return;
+        }
+
+        currentFinesStudent = student;
+        currentFines = [];
+        selectedFine = null;
+
+        finesStudentInfo.textContent =
+            `${student.student_name} | Student No. ${student.student_number}`;
+
+        finesTotalAmount.textContent = formatCurrency(0);
+        finesTotalPaid.textContent = formatCurrency(0);
+        finesTotalBalance.textContent = formatCurrency(0);
+
+        finesTableBody.innerHTML = `
+            <tr>
+                <td colspan="8" class="fines-empty">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    Loading fine records...
+                </td>
+            </tr>
+        `;
+
+        paymentHistoryBody.innerHTML = `
+            <tr>
+                <td colspan="5" class="fines-empty">
+                    Select a fine to view its payment history.
+                </td>
+            </tr>
+        `;
+
+        finePaymentSection.hidden = true;
+
+        openFinesModal();
+
+        try {
+            const response = await fetch(
+                `${FINES_API_URL}/student/${studentId}`
+            );
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(
+                    result.message || 'Unable to load student fines.'
+                );
+            }
+
+            currentFines = Array.isArray(result.data) ? result.data : [];
+
+            displayFines(currentFines);
+
+        } catch (error) {
+            console.error('Load student fines error:', error);
+
+            finesTableBody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="fines-empty">
+                        ${escapeHTML(error.message)}
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+
+
+    function updateFinesSummary(fines) {
+        const totalAmount = fines.reduce(
+            (total, fine) => total + Number(fine.amount || 0),
+            0
+        );
+
+        const totalPaid = fines.reduce(
+            (total, fine) => total + Number(fine.amount_paid || 0),
+            0
+        );
+
+        const totalBalance = fines.reduce(
+            (total, fine) => total + Number(fine.balance || 0),
+            0
+        );
+
+        finesTotalAmount.textContent = formatCurrency(totalAmount);
+        finesTotalPaid.textContent = formatCurrency(totalPaid);
+        finesTotalBalance.textContent = formatCurrency(totalBalance);
+    }
+
+
+
+    function displayFines(fines) {
+        updateFinesSummary(fines);
+
+        if (!fines.length) {
+            finesTableBody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="fines-empty">
+                        <i class="fa-solid fa-circle-check"></i>
+                        No fine records found for this student.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        finesTableBody.innerHTML = fines.map(fine => {
+            const status = String(fine.status || 'Unpaid').toLowerCase();
+
+            const statusClass = status === 'paid'
+                ? 'paid'
+                : status === 'partially paid'
+                    ? 'partial'
+                    : 'unpaid';
+
+            const balance = Number(fine.balance || 0);
+
+            return `
+                <tr>
+                    <td>${Number(fine.fine_id)}</td>
+                    <td>${Number(fine.borrow_id)}</td>
+                    <td>${escapeHTML(fine.reason || '—')}</td>
+                    <td>${formatCurrency(fine.amount)}</td>
+                    <td>${formatCurrency(fine.amount_paid)}</td>
+                    <td>${formatCurrency(fine.balance)}</td>
+                    <td>
+                        <span class="fine-status ${statusClass}">
+                            ${escapeHTML(fine.status || 'Unpaid')}
+                        </span>
+                    </td>
+                    <td>
+                        ${
+                            balance > 0
+                                ? `
+                                    <button
+                                        type="button"
+                                        class="btn-primary"
+                                        data-fine-action="payment"
+                                        data-fine-id="${Number(fine.fine_id)}">
+                                        <i class="fa-solid fa-credit-card"></i>
+                                        Pay
+                                    </button>
+                                `
+                                : '<span class="fine-status paid">Completed</span>'
+                        }
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+
+
+    function selectFine(fineId) {
+        const fine = currentFines.find(item =>
+            Number(item.fine_id) === Number(fineId)
+        );
+
+        if (!fine) {
+            showPaymentMessage('Fine record not found.', 'error');
+            return;
+        }
+
+        const balance = Number(fine.balance || 0);
+
+        if (balance <= 0) {
+            showPaymentMessage('This fine has already been paid.', 'info');
+            return;
+        }
+
+        selectedFine = fine;
+
+        finePaymentSection.hidden = false;
+
+        selectedFineInfo.textContent =
+            `Fine #${fine.fine_id} | Remaining balance: ${formatCurrency(balance)}`;
+
+        paymentAmount.value = '';
+        paymentAmount.min = '0.01';
+        paymentAmount.max = balance.toFixed(2);
+        paymentAmount.placeholder = `Maximum: ${formatCurrency(balance)}`;
+
+        paymentMethod.value = '';
+
+        paymentMessage.textContent = '';
+        paymentMessage.className = 'message-box';
+
+        loadPaymentHistory(fine.fine_id);
+
+        finePaymentSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        });
+    }
+
+
+
+    finesTableBody?.addEventListener('click', event => {
+        const button = event.target.closest(
+            'button[data-fine-action="payment"]'
+        );
+
+        if (!button) return;
+
+        selectFine(Number(button.dataset.fineId));
+    });
+
+
+
+    async function loadPaymentHistory(fineId) {
+        paymentHistoryBody.innerHTML = `
+            <tr>
+                <td colspan="5" class="fines-empty">
+                    Loading payment history...
+                </td>
+            </tr>
+        `;
+
+        try {
+            const response = await fetch(
+                `${FINES_API_URL}/${fineId}/payments`
+            );
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(
+                    result.message || 'Unable to load payment history.'
+                );
+            }
+
+            const payments = Array.isArray(result.data)
+                ? result.data
+                : [];
+
+            displayPaymentHistory(payments, fineId);
+
+        } catch (error) {
+            console.error('Payment history error:', error);
+
+            paymentHistoryBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="fines-empty">
+                        ${escapeHTML(error.message)}
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+
+
+    function displayPaymentHistory(payments, fineId) {
+        if (!payments.length) {
+            paymentHistoryBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="fines-empty">
+                        No payments have been recorded for this fine.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        paymentHistoryBody.innerHTML = payments.map(payment => `
+            <tr>
+                <td>${Number(payment.payment_id)}</td>
+                <td>${Number(payment.fine_id || fineId)}</td>
+                <td>${formatCurrency(payment.amount_paid)}</td>
+                <td>${escapeHTML(payment.payment_method || '—')}</td>
+                <td>${formatDate(payment.payment_date)}</td>
+            </tr>
+        `).join('');
+    }
+
+
+    paymentForm?.addEventListener('submit', async event => {
+        event.preventDefault();
+
+        if (!selectedFine) {
+            showPaymentMessage('Please select a fine first.', 'error');
+            return;
+        }
+
+        const amount = Number(paymentAmount.value);
+        const balance = Number(selectedFine.balance || 0);
+        const method = paymentMethod.value;
+
+        if (!Number.isFinite(amount) || amount <= 0) {
+            showPaymentMessage(
+                'Enter a valid payment amount.',
+                'error'
+            );
+            return;
+        }
+
+        if (amount > balance + 0.000001) {
+            showPaymentMessage(
+                `Payment cannot exceed the remaining balance of ${formatCurrency(balance)}.`,
+                'error'
+            );
+            return;
+        }
+
+        if (!Number.isInteger(amount * 100)) {
+            showPaymentMessage(
+                'Payment amount can only have up to two decimal places.',
+                'error'
+            );
+            return;
+        }
+
+        submitPaymentBtn.disabled = true;
+        submitPaymentBtn.innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+
+        try {
+            const response = await fetch(
+                `${FINES_API_URL}/${selectedFine.fine_id}/payments`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        amount_paid: amount,
+                        payment_method: method || 'Cash'
+                    })
+                }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(
+                    result.message || 'Unable to record payment.'
+                );
+            }
+
+            const studentId = currentFinesStudent.student_id;
+            const fineId = selectedFine.fine_id;
+
+            showPaymentMessage(
+                result.message || 'Payment recorded successfully.',
+                'success'
+            );
+
+            paymentForm.reset();
+
+            const finesResponse = await fetch(
+                `${FINES_API_URL}/student/${studentId}`
+            );
+
+            const finesResult = await finesResponse.json();
+
+            if (!finesResponse.ok || !finesResult.success) {
+                throw new Error(
+                    finesResult.message || 'Payment saved, but fines could not be refreshed.'
+                );
+            }
+
+            currentFines = Array.isArray(finesResult.data)
+                ? finesResult.data
+                : [];
+
+            displayFines(currentFines);
+
+            selectedFine = currentFines.find(item =>
+                Number(item.fine_id) === Number(fineId)
+            ) || null;
+
+            if (selectedFine && Number(selectedFine.balance) > 0) {
+                selectedFineInfo.textContent =
+                    `Fine #${selectedFine.fine_id} | Remaining balance: ${formatCurrency(selectedFine.balance)}`;
+
+                paymentAmount.max = Number(selectedFine.balance).toFixed(2);
+                paymentAmount.placeholder =
+                    `Maximum: ${formatCurrency(selectedFine.balance)}`;
+            } else {
+                finePaymentSection.hidden = true;
+                selectedFine = null;
+            }
+
+            await loadPaymentHistory(fineId);
+
+        } catch (error) {
+            console.error('Record payment error:', error);
+            showPaymentMessage(error.message, 'error');
+
+        } finally {
+            submitPaymentBtn.disabled = false;
+            submitPaymentBtn.innerHTML =
+                '<i class="fa-solid fa-check"></i> Record Payment';
+        }
+    });
+
+    cancelPaymentBtn?.addEventListener('click', () => {
+        finePaymentSection.hidden = true;
+        paymentForm.reset();
+        selectedFine = null;
+    });
+
+
 
     function openDeleteModal(student) {
         if (!deleteModal) {
-            showMessage('Delete confirmation modal is missing from the page.', 'error');
+            showMessage(
+                'Delete confirmation modal is missing from the page.',
+                'error'
+            );
             return;
         }
 
@@ -126,6 +639,8 @@ document.addEventListener('DOMContentLoaded', () => {
         confirmDeleteBtn.hidden = false;
         confirmDeleteBtn.disabled = false;
         confirmDeleteBtn.textContent = 'Delete Student';
+
+        cancelDeleteBtn.textContent = 'Cancel';
 
         deleteModal.classList.add('show');
         deleteModal.setAttribute('aria-hidden', 'false');
@@ -144,6 +659,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.remove('modal-open');
 
         pendingDeleteStudentId = null;
+
+        confirmDeleteBtn.hidden = false;
+        cancelDeleteBtn.textContent = 'Cancel';
     }
 
     function showLinkedRecordsMessage() {
@@ -166,14 +684,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.addEventListener('keydown', event => {
-        if (event.key === 'Escape' && deleteModal?.classList.contains('show')) {
+        if (event.key !== 'Escape') return;
+
+        if (finesModal?.classList.contains('show')) {
+            closeFinesModal();
+        } else if (deleteModal?.classList.contains('show')) {
             closeDeleteModal();
         }
     });
 
-    // ==========================================
-    // FORM MANAGEMENT
-    // ==========================================
+
 
     function openForm() {
         registerCard.hidden = false;
@@ -212,9 +732,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cancelRegisterBtn.addEventListener('click', closeForm);
     closeFormBtn.addEventListener('click', closeForm);
 
-    // ==========================================
-    // STUDENT STATISTICS
-    // ==========================================
+
 
     function updateStatistics() {
         const borrowerCount = students.filter(student =>
@@ -228,9 +746,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (studentsOnly) studentsOnly.textContent = studentOnlyCount;
     }
 
-    // ==========================================
-    // LOAD STUDENTS
-    // ==========================================
+
 
     async function loadStudents() {
         tableBody.innerHTML = `
@@ -244,7 +760,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
 
             if (!response.ok || !result.success) {
-                throw new Error(result.message || 'Failed to load students.');
+                throw new Error(
+                    result.message || 'Failed to load students.'
+                );
             }
 
             students = Array.isArray(result.data) ? result.data : [];
@@ -266,9 +784,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ==========================================
-    // DISPLAY STUDENTS
-    // ==========================================
+
 
     function displayStudents(list) {
         studentCount.textContent =
@@ -308,9 +824,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                 class="action-btn edit"
                                 data-action="edit"
                                 data-id="${Number(student.student_id)}"
-                                title="Edit student"
-                            >
+                                title="Edit student">
                                 <i class="fa-solid fa-pen"></i>
+                            </button>
+
+                            <button
+                                type="button"
+                                class="action-btn fines"
+                                data-action="fines"
+                                data-id="${Number(student.student_id)}"
+                                title="View student fines">
+                                <i class="fa-solid fa-money-bill-wave"></i>
                             </button>
 
                             <button
@@ -318,8 +842,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 class="action-btn delete"
                                 data-action="delete"
                                 data-id="${Number(student.student_id)}"
-                                title="Delete student"
-                            >
+                                title="Delete student">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
@@ -329,9 +852,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
-    // ==========================================
-    // SEARCH
-    // ==========================================
+
 
     function filterStudents() {
         const search = searchInput.value.toLowerCase().trim();
@@ -354,9 +875,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchInput.addEventListener('input', filterStudents);
 
-    // ==========================================
-    // FORM DATA
-    // ==========================================
+
 
     function getFormData() {
         return {
@@ -369,9 +888,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // ==========================================
-    // REGISTER / UPDATE STUDENT
-    // ==========================================
+
 
     registerForm.addEventListener('submit', async event => {
         event.preventDefault();
@@ -402,7 +919,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
 
             if (!response.ok || !result.success) {
-                throw new Error(result.message || 'Unable to save student.');
+                throw new Error(
+                    result.message || 'Unable to save student.'
+                );
             }
 
             closeForm();
@@ -431,9 +950,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ==========================================
-    // EDIT STUDENT
-    // ==========================================
+
 
     function editStudent(studentId) {
         const student = students.find(item =>
@@ -473,9 +990,7 @@ document.addEventListener('DOMContentLoaded', () => {
         openForm();
     }
 
-    // ==========================================
-    // DELETE STUDENT
-    // ==========================================
+
 
     async function deleteStudent(studentId) {
         const student = students.find(item =>
@@ -506,7 +1021,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
 
             if (!response.ok || !result.success) {
-                const message = result.message || 'Unable to delete student.';
+                const message = result.message ||
+                    'Unable to delete student.';
 
                 if (
                     response.status === 409 ||
@@ -541,11 +1057,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    confirmDeleteBtn?.addEventListener('click', confirmDeleteStudent);
+    confirmDeleteBtn?.addEventListener(
+        'click',
+        confirmDeleteStudent
+    );
 
-    // ==========================================
-    // TABLE ACTIONS
-    // ==========================================
+
 
     tableBody.addEventListener('click', event => {
         const button = event.target.closest('button[data-action]');
@@ -558,20 +1075,20 @@ document.addEventListener('DOMContentLoaded', () => {
             editStudent(studentId);
         }
 
+        if (button.dataset.action === 'fines') {
+            openStudentFines(studentId);
+        }
+
         if (button.dataset.action === 'delete') {
             deleteStudent(studentId);
         }
     });
 
-    // ==========================================
-    // REFRESH
-    // ==========================================
+
 
     refreshBtn.addEventListener('click', loadStudents);
 
-    // ==========================================
-    // INITIAL LOAD
-    // ==========================================
+
 
     loadStudents();
 });

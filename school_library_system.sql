@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 02, 2026 at 07:12 AM
+-- Generation Time: Nov 02, 2026 at 01:56 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -52,7 +52,16 @@ INSERT INTO `activity_logs` (`id`, `admin_id`, `action`, `description`, `created
 (10, 1, 'LOGIN', 'Administrator admin logged in.', '2026-11-01 08:25:28'),
 (11, NULL, 'RETURN_ITEM', 'Returned 1 Damaged copy/copies for borrowing record #3. Return ID #3.', '2026-11-01 08:25:56'),
 (12, NULL, 'ISSUE_BOOK', 'Book \"wdawdwa\" issued to tester2. Borrow ID: 4.', '2026-11-02 05:21:40'),
-(13, NULL, 'RETURN_ITEM', 'Returned 1 Good copy/copies for borrowing record #4. Return ID #4.', '2026-11-02 05:21:53');
+(13, NULL, 'RETURN_ITEM', 'Returned 1 Good copy/copies for borrowing record #4. Return ID #4.', '2026-11-02 05:21:53'),
+(14, NULL, 'ISSUE_BOOK', 'Book 4 issued to tester2. Borrow ID: 5.', '2026-11-02 10:55:57'),
+(15, NULL, 'RETURN_ITEM', 'Returned 1 Good copy/copies for borrowing record #5. Return ID #5.', '2026-11-02 11:20:44'),
+(16, NULL, 'ISSUE_BOOK', 'Book 2 issued to tester2. Borrow ID: 6.', '2026-11-02 11:31:58'),
+(17, NULL, 'RETURN_ITEM', 'Returned 1 Good copy/copies for borrowing record #6. Return ID #6.', '2026-11-02 11:32:13'),
+(18, NULL, 'ISSUE_BOOK', 'Book 2 issued to wqw qwdqw. Borrow ID: 7.', '2026-11-02 11:37:04'),
+(19, NULL, 'RETURN_ITEM', 'Returned 1 Good copy/copies for borrowing record #7. Return ID #7.', '2026-11-02 11:39:02'),
+(20, 1, 'LOGIN', 'Administrator admin logged in.', '2026-11-02 12:24:07'),
+(21, 1, 'LOGIN', 'Administrator admin logged in.', '2026-11-02 12:24:22'),
+(22, 1, 'LOGIN', 'Administrator admin logged in.', '2026-11-02 12:44:28');
 
 -- --------------------------------------------------------
 
@@ -94,18 +103,17 @@ CREATE TABLE `books` (
   `total_copies` int(11) NOT NULL DEFAULT 0,
   `available_copies` int(11) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `is_archived` tinyint(1) NOT NULL DEFAULT 0
 ) ;
 
 --
 -- Dumping data for table `books`
 --
 
-INSERT INTO `books` (`book_id`, `title`, `isbn`, `category_id`, `publisher_id`, `publication_year`, `total_copies`, `available_copies`, `created_at`, `updated_at`) VALUES
-(2, 'Database Management Systems', '9789876543210', 1, NULL, '2026', 5, 4, '2026-11-01 00:43:49', '2026-11-01 08:24:22'),
-(3, 'temptbook', '12312421123', 1, NULL, '0000', 1, 1, '2026-11-01 09:27:36', '2026-11-01 09:27:36'),
-(4, 'wdawdwa', 'dwadwda', 1, 6, '2025', 5, 5, '2026-11-01 09:32:24', '2026-11-02 05:21:53'),
-(7, 'wqdwqe2', '123123123', 4, 6, '2027', 233, 233, '2026-11-02 03:52:34', '2026-11-02 03:52:34');
+INSERT INTO `books` (`book_id`, `title`, `isbn`, `category_id`, `publisher_id`, `publication_year`, `total_copies`, `available_copies`, `created_at`, `updated_at`, `is_archived`) VALUES
+(2, 'Database Management Systems', '9789876543210', 1, 6, '2026', 5, 4, '2026-11-01 00:43:49', '2026-11-02 11:39:02', 0),
+(4, 'wdawdwa', 'dwadwda', 1, 6, '2025', 5, 5, '2026-11-01 09:32:24', '2026-11-02 11:20:44', 0);
 
 -- --------------------------------------------------------
 
@@ -125,7 +133,8 @@ CREATE TABLE `borrowers` (
 
 INSERT INTO `borrowers` (`borrower_id`, `student_id`, `registration_date`) VALUES
 (1, 1, '2026-11-01 04:14:08'),
-(2, 3, '2026-11-01 08:21:21');
+(2, 3, '2026-11-01 08:21:21'),
+(3, 5, '2026-11-02 10:12:21');
 
 -- --------------------------------------------------------
 
@@ -148,7 +157,10 @@ INSERT INTO `borrow_details` (`borrow_detail_id`, `borrow_id`, `book_id`, `quant
 (1, 1, 2, 1),
 (2, 2, 2, 1),
 (3, 3, 2, 1),
-(4, 4, 4, 1);
+(4, 4, 4, 1),
+(5, 5, 4, 1),
+(6, 6, 2, 1),
+(7, 7, 2, 1);
 
 -- --------------------------------------------------------
 
@@ -175,7 +187,10 @@ INSERT INTO `borrow_records` (`borrow_id`, `student_id`, `book_id`, `borrow_date
 (1, 1, 2, '2026-10-31', '2026-11-07', '2026-11-01', 'Returned', '2026-11-01 04:34:29'),
 (2, 1, 2, '2026-10-31', '2026-11-07', '2026-11-01', 'Returned', '2026-11-01 04:34:59'),
 (3, 3, 2, '2026-11-01', '2026-11-08', '2026-11-01', 'Returned', '2026-11-01 08:24:22'),
-(4, 3, 4, '2026-11-01', '2026-11-08', '2026-11-02', 'Returned', '2026-11-02 05:21:40');
+(4, 3, 4, '2026-11-01', '2026-11-08', '2026-11-02', 'Returned', '2026-11-02 05:21:40'),
+(5, 3, 4, '2026-11-02', '2026-11-09', '2026-11-02', 'Returned', '2026-11-02 10:55:57'),
+(6, 3, 2, '2026-11-02', '2026-11-09', '2026-11-02', 'Returned', '2026-11-02 11:31:58'),
+(7, 5, 2, '2026-10-20', '2026-10-27', '2026-11-02', 'Returned', '2026-11-02 11:37:04');
 
 -- --------------------------------------------------------
 
@@ -195,8 +210,7 @@ CREATE TABLE `categories` (
 --
 
 INSERT INTO `categories` (`category_id`, `category_name`, `description`, `created_at`) VALUES
-(1, 'Computer Science', 'Books about computers and technology', '2026-10-31 23:43:00'),
-(4, 'dadwa', 'awdadwa', '2026-11-02 03:52:03');
+(1, 'Computer Science', 'Books about computers and technology', '2026-10-31 23:43:00');
 
 -- --------------------------------------------------------
 
@@ -214,6 +228,13 @@ CREATE TABLE `fines` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ;
 
+--
+-- Dumping data for table `fines`
+--
+
+INSERT INTO `fines` (`fine_id`, `borrow_id`, `student_id`, `amount`, `reason`, `status`, `created_at`) VALUES
+(1, 7, 5, 30.00, 'Overdue return: 6 day(s)', 'Paid', '2026-11-02 11:39:02');
+
 -- --------------------------------------------------------
 
 --
@@ -227,6 +248,13 @@ CREATE TABLE `fine_payments` (
   `payment_date` timestamp NOT NULL DEFAULT current_timestamp(),
   `payment_method` varchar(50) DEFAULT NULL
 ) ;
+
+--
+-- Dumping data for table `fine_payments`
+--
+
+INSERT INTO `fine_payments` (`payment_id`, `fine_id`, `amount_paid`, `payment_date`, `payment_method`) VALUES
+(1, 1, 30.00, '2026-11-02 12:06:22', 'Cash');
 
 -- --------------------------------------------------------
 
@@ -248,8 +276,7 @@ CREATE TABLE `publishers` (
 --
 
 INSERT INTO `publishers` (`publisher_id`, `publisher_name`, `contact_email`, `contact_number`, `address`, `created_at`) VALUES
-(6, 'McGraw Hill', 'support@mheducation.com', '+1 800 338 3987', 'New York, USA', '2026-11-01 09:30:44'),
-(7, 'wdadwa', 'awdwadw@gmail', 'dwadwadad', 'dwadwa', '2026-11-01 16:51:32');
+(6, 'McGraw Hill', 'support@mheducation.com', '+1 800 338 3987', 'New York, USA', '2026-11-01 09:30:44');
 
 -- --------------------------------------------------------
 
@@ -273,7 +300,10 @@ INSERT INTO `return_details` (`return_detail_id`, `return_id`, `book_id`, `quant
 (1, 1, 2, 1, 'Good'),
 (2, 2, 2, 1, 'Good'),
 (3, 3, 2, 1, 'Damaged'),
-(4, 4, 4, 1, 'Good');
+(4, 4, 4, 1, 'Good'),
+(5, 5, 4, 1, 'Good'),
+(6, 6, 2, 1, 'Good'),
+(7, 7, 2, 1, 'Good');
 
 -- --------------------------------------------------------
 
@@ -298,7 +328,10 @@ INSERT INTO `return_records` (`return_id`, `borrow_id`, `processed_by`, `return_
 (1, 1, NULL, '2026-11-01', NULL, '2026-11-01 06:47:15'),
 (2, 2, NULL, '2026-11-01', NULL, '2026-11-01 06:47:18'),
 (3, 3, NULL, '2026-11-01', 'Book Cover Torn', '2026-11-01 08:25:56'),
-(4, 4, NULL, '2026-11-02', NULL, '2026-11-02 05:21:53');
+(4, 4, NULL, '2026-11-02', NULL, '2026-11-02 05:21:53'),
+(5, 5, NULL, '2026-11-02', NULL, '2026-11-02 11:20:44'),
+(6, 6, NULL, '2026-11-02', NULL, '2026-11-02 11:32:13'),
+(7, 7, NULL, '2026-11-02', NULL, '2026-11-02 11:39:02');
 
 -- --------------------------------------------------------
 
@@ -324,7 +357,7 @@ CREATE TABLE `students` (
 INSERT INTO `students` (`student_id`, `student_number`, `student_name`, `email`, `course`, `year_level`, `contact_number`, `created_at`) VALUES
 (1, '2026-0001', 'Juan Dela Cruz', 'juan.delacruz@example.com', 'BS Information Technology', '1st Year', '09123456789', '2026-11-01 04:13:53'),
 (3, '202628825', 'tester2', 'tester2@gmail.com', 'BS Information tech nology', '3rd Year', '09246358456', '2026-11-01 08:15:16'),
-(4, 'dawdawd', 'dwadwa', 'awdawda@gmai.com', 'dwadaw', '2nd Year', 'w554564', '2026-11-02 04:58:48');
+(5, 'dadawdsdw a', 'wqw qwdqw', 'dwadwda@gmail.com', 'dawda wadw', '5th Year', 'dw123123213', '2026-11-02 10:12:11');
 
 -- --------------------------------------------------------
 
@@ -471,7 +504,7 @@ ALTER TABLE `system_settings`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `admins`
@@ -489,7 +522,7 @@ ALTER TABLE `books`
 -- AUTO_INCREMENT for table `borrowers`
 --
 ALTER TABLE `borrowers`
-  MODIFY `borrower_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `borrower_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `borrow_details`
@@ -501,13 +534,13 @@ ALTER TABLE `borrow_details`
 -- AUTO_INCREMENT for table `borrow_records`
 --
 ALTER TABLE `borrow_records`
-  MODIFY `borrow_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `borrow_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `fines`
@@ -525,7 +558,7 @@ ALTER TABLE `fine_payments`
 -- AUTO_INCREMENT for table `publishers`
 --
 ALTER TABLE `publishers`
-  MODIFY `publisher_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `publisher_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `return_details`
@@ -537,19 +570,19 @@ ALTER TABLE `return_details`
 -- AUTO_INCREMENT for table `return_records`
 --
 ALTER TABLE `return_records`
-  MODIFY `return_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `return_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `student_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `student_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `system_settings`
 --
 ALTER TABLE `system_settings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=248;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=303;
 
 --
 -- Constraints for dumped tables

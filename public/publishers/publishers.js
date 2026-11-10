@@ -35,9 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let publishers = [];
     let editingPublisherId = null;
 
-    // =========================================
-    // API REQUEST
-    // =========================================
+
 
     async function request(url, options = {}) {
         const token = localStorage.getItem('authToken');
@@ -66,9 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return result;
     }
 
-    // =========================================
-    // GET PUBLISHER EMAIL
-    // =========================================
+
 
     function getPublisherEmail(publisher) {
         return publisher.email ||
@@ -77,9 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
                '';
     }
 
-    // =========================================
-    // LOAD PUBLISHERS
-    // =========================================
+
 
     async function loadPublishers() {
         showTableMessage('Loading publishers...');
@@ -101,9 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // =========================================
-    // RENDER TABLE
-    // =========================================
+
 
     function renderPublishers() {
         if (!elements.tableBody) return;
@@ -201,9 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `${count} ${count === 1 ? 'publisher' : 'publishers'} found`;
     }
 
-    // =========================================
-    // STATISTICS
-    // =========================================
+
 
     function updateStatistics() {
         const total = publishers.length;
@@ -229,9 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // =========================================
-    // OPEN / CLOSE MODAL
-    // =========================================
+
 
     function openModal(publisher = null) {
         if (!elements.modal || !elements.form) return;
@@ -289,9 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.form?.reset();
     }
 
-    // =========================================
-    // SAVE PUBLISHER
-    // =========================================
+
 
     async function savePublisher(event) {
         event.preventDefault();
@@ -350,9 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // =========================================
-    // EDIT PUBLISHER
-    // =========================================
+
 
     function editPublisher(publisherId) {
         const publisher = publishers.find(
@@ -367,9 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal(publisher);
     }
 
-    // =========================================
-    // DELETE PUBLISHER
-    // =========================================
+
 
     async function deletePublisher(publisherId) {
         const publisher = publishers.find(
@@ -403,9 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // =========================================
-    // CONFIRM DIALOG
-    // =========================================
+
 
     function showConfirmDialog(title, message, confirmText = 'Confirm') {
         return new Promise(resolve => {
@@ -469,9 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // =========================================
-    // NOTIFICATIONS
-    // =========================================
+
 
     function showMessage(message, type = 'success') {
         if (!elements.message) return;
@@ -495,9 +473,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.message.style.display = 'none';
     }
 
-    // =========================================
-    // DARK MODE
-    // =========================================
+
 
     function updateThemeButton(isDark) {
         if (!elements.themeButton) return;
@@ -530,9 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateThemeButton(isDark);
     }
 
-    // =========================================
-    // LOGOUT
-    // =========================================
+
 
     async function logout() {
         const confirmed = await showConfirmDialog(
@@ -550,9 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = '../login/login.html';
     }
 
-    // =========================================
-    // HTML ESCAPING
-    // =========================================
+
 
     function escapeHTML(value) {
         return String(value ?? '').replace(/[&<>"']/g, character => {
@@ -568,9 +540,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // =========================================
-    // EVENT LISTENERS
-    // =========================================
+
 
     elements.addButton?.addEventListener('click', () => openModal());
 
@@ -606,9 +576,7 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.themeButton?.addEventListener('click', toggleTheme);
     elements.logoutButton?.addEventListener('click', logout);
 
-    // =========================================
-    // INITIALIZE
-    // =========================================
+
 
     applyTheme();
     loadPublishers();

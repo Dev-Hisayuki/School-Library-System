@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -416,7 +417,10 @@
 
     </div>
 
-    <!-- DELETE CONFIRMATION MODAL -->
+    <!-- ==========================================
+         DELETE CONFIRMATION MODAL
+    =========================================== -->
+
     <div
         class="delete-modal"
         id="deleteModal"
@@ -460,6 +464,231 @@
                     class="modal-delete-btn"
                     id="confirmDeleteBtn">
                     Delete Student
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+         FINES AND PAYMENTS MODAL
+    =========================================== -->
+
+    <div
+        class="fines-modal"
+        id="finesModal"
+        aria-hidden="true">
+
+        <div
+            class="fines-modal-content"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="finesModalTitle">
+
+            <!-- MODAL HEADER -->
+            <div class="fines-modal-header">
+
+                <div>
+                    <h2 id="finesModalTitle">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                        Student Fines and Payments
+                    </h2>
+
+                    <p id="finesStudentInfo">
+                        Student information will appear here.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="fines-modal-close"
+                    id="closeFinesModalBtn"
+                    aria-label="Close fines modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+            </div>
+
+            <!-- FINES SUMMARY -->
+            <div class="fines-summary">
+
+                <div class="fines-summary-card">
+                    <span>Total Fines</span>
+                    <strong id="finesTotalAmount">₱0.00</strong>
+                </div>
+
+                <div class="fines-summary-card">
+                    <span>Total Paid</span>
+                    <strong id="finesTotalPaid">₱0.00</strong>
+                </div>
+
+                <div class="fines-summary-card">
+                    <span>Remaining Balance</span>
+                    <strong id="finesTotalBalance">₱0.00</strong>
+                </div>
+
+            </div>
+
+            <!-- FINE RECORDS -->
+            <section class="fines-section">
+
+                <h3>
+                    <i class="fa-solid fa-receipt"></i>
+                    Fine Records
+                </h3>
+
+                <div class="fines-table-wrapper">
+
+                    <table class="fines-table">
+
+                        <thead>
+                            <tr>
+                                <th>Fine ID</th>
+                                <th>Borrow ID</th>
+                                <th>Reason</th>
+                                <th>Amount</th>
+                                <th>Paid</th>
+                                <th>Balance</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="finesTableBody">
+                            <tr>
+                                <td colspan="8" class="fines-empty">
+                                    Select a student to view fine records.
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+            <!-- RECORD PAYMENT -->
+            <section class="fines-section" id="finePaymentSection" hidden>
+
+                <h3>
+                    <i class="fa-solid fa-credit-card"></i>
+                    Record Payment
+                </h3>
+
+                <p id="selectedFineInfo">
+                    Select a fine record to continue.
+                </p>
+
+                <div
+                    id="paymentMessage"
+                    class="message-box"
+                    role="alert"
+                    aria-live="polite">
+                </div>
+
+                <form id="paymentForm" class="fine-payment-form">
+
+                    <div class="form-group">
+
+                        <label for="paymentAmount">
+                            Payment Amount (₱) *
+                        </label>
+
+                        <input
+                            type="number"
+                            id="paymentAmount"
+                            min="0.01"
+                            step="0.01"
+                            placeholder="Enter payment amount"
+                            required>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="paymentMethod">
+                            Payment Method
+                        </label>
+
+                        <select id="paymentMethod">
+                            <option value="">Select payment method</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Other">Other</option>
+                        </select>
+
+                    </div>
+
+                    <div class="form-actions">
+
+                        <button
+                            type="button"
+                            class="btn-secondary"
+                            id="cancelPaymentBtn">
+                            Cancel
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="btn-primary"
+                            id="submitPaymentBtn">
+                            <i class="fa-solid fa-check"></i>
+                            Record Payment
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+            <!-- PAYMENT HISTORY -->
+            <section class="fines-section">
+
+                <h3>
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    Payment History
+                </h3>
+
+                <div class="fines-table-wrapper">
+
+                    <table class="fines-table">
+
+                        <thead>
+                            <tr>
+                                <th>Payment ID</th>
+                                <th>Fine ID</th>
+                                <th>Amount Paid</th>
+                                <th>Payment Method</th>
+                                <th>Payment Date</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="paymentHistoryBody">
+                            <tr>
+                                <td colspan="5" class="fines-empty">
+                                    Select a fine to view its payment history.
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+            <!-- MODAL FOOTER -->
+            <div class="fines-modal-footer">
+
+                <button
+                    type="button"
+                    class="btn-secondary"
+                    id="closeFinesFooterBtn">
+                    Close
                 </button>
 
             </div>
