@@ -1,13 +1,23 @@
+
 const BookModel = require('../models/bookModel');
+
 
 exports.getBooks = async (req, res) => {
     try {
         const books = await BookModel.getAllBooks();
-        res.status(200).json({ success: true, data: books });
+
+        res.status(200).json({
+            success: true,
+            data: books
+        });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
 };
+
 
 exports.getBookById = async (req, res) => {
     try {
@@ -20,11 +30,18 @@ exports.getBookById = async (req, res) => {
             });
         }
 
-        res.status(200).json({ success: true, data: book });
+        res.status(200).json({
+            success: true,
+            data: book
+        });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
 };
+
 
 exports.createBook = async (req, res) => {
     try {
@@ -35,7 +52,12 @@ exports.createBook = async (req, res) => {
             available_copies = total_copies
         } = req.body;
 
-        if (!title?.trim() || !isbn?.trim()) {
+        if (
+            typeof title !== 'string' ||
+            !title.trim() ||
+            typeof isbn !== 'string' ||
+            !isbn.trim()
+        ) {
             return res.status(400).json({
                 success: false,
                 message: 'Title and ISBN are required.'
@@ -51,7 +73,7 @@ exports.createBook = async (req, res) => {
         ) {
             return res.status(400).json({
                 success: false,
-                message: 'Copy counts must be valid, non-negative integers, and available copies cannot exceed total copies.'
+                message: 'Copy counts must be valid non-negative integers, and available copies cannot exceed total copies.'
             });
         }
 
@@ -78,6 +100,7 @@ exports.createBook = async (req, res) => {
     }
 };
 
+
 exports.updateBook = async (req, res) => {
     try {
         const {
@@ -88,8 +111,10 @@ exports.updateBook = async (req, res) => {
         } = req.body;
 
         if (
-            !title?.trim() ||
-            !isbn?.trim() ||
+            typeof title !== 'string' ||
+            !title.trim() ||
+            typeof isbn !== 'string' ||
+            !isbn.trim() ||
             total_copies === undefined ||
             available_copies === undefined
         ) {
@@ -119,14 +144,10 @@ exports.updateBook = async (req, res) => {
         });
 
         if (!affected) {
-            const existing = await BookModel.getBookById(req.params.id);
-
-            if (!existing) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Book not found.'
-                });
-            }
+            return res.status(404).json({
+                success: false,
+                message: 'Book not found or already archived.'
+            });
         }
 
         res.status(200).json({
@@ -143,6 +164,7 @@ exports.updateBook = async (req, res) => {
     }
 };
 
+
 exports.deleteBook = async (req, res) => {
     try {
         const affected = await BookModel.deleteBook(req.params.id);
@@ -150,20 +172,18 @@ exports.deleteBook = async (req, res) => {
         if (!affected) {
             return res.status(404).json({
                 success: false,
-                message: 'Book not found.'
+                message: 'Book not found or already archived.'
             });
         }
 
         res.status(200).json({
             success: true,
-            message: 'Book deleted successfully.'
+            message: 'Book archived successfully.'
         });
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: error.code === 'ER_ROW_IS_REFERENCED_2'
-                ? 'This book is connected to borrowing or return records and cannot be deleted.'
-                : error.message
+            message: error.message
         });
     }
 };

@@ -1,13 +1,57 @@
 const db = require('../config/db');
 const borrowDetailModel = require('./borrowDetailModel');
 
-// Issue a book using a database transaction
-const createBorrowTransaction = async (studentId, bookId) => {
-const createBorrowTransaction = async (studentId, itemId, dueDate) => {
+function getManilaDate() {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Manila',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).formatToParts(new Date());
+
+    const values = {};
+
+    parts.forEach(part => {
+        values[part.type] = part.value;
+    });
+
+    return `${values.year}-${values.month}-${values.day}`;
+}
+
+function formatDate(value) {
+    if (!value) return null;
+
+    if (typeof value === 'string') {
+        return value.slice(0, 10);
+    }
+
+    if (value instanceof Date) {
+        const parts = new Intl.DateTimeFormat('en-CA', {
+            timeZone: 'Asia/Manila',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }).formatToParts(value);
+
+        const values = {};
+
+        parts.forEach(part => {
+            values[part.type] = part.value;
+        });
+
+        return `${values.year}-${values.month}-${values.day}`;
+    }
+
+    return null;
+}
+
+const createBorrowTransaction = async (studentId, bookId, dueDate = null) => {
     const connection = await db.getConnection();
 
     try {
         await connection.beginTransaction();
+
+        const manilaDate = getManilaDate();
 
         const [students] = await connection.query(
             `SELECT student_id, student_name
@@ -64,9 +108,9 @@ const createBorrowTransaction = async (studentId, itemId, dueDate) => {
              FROM borrow_records
              WHERE student_id = ?
                AND status IN ('Borrowed', 'Overdue')
-               AND due_date < CURDATE()
+               AND due_date < ?
              LIMIT 1`,
-            [studentId]
+            [studentId, manilaDate]
         );
 
         if (overdueBooks.length > 0) {
@@ -100,62 +144,55 @@ const createBorrowTransaction = async (studentId, itemId, dueDate) => {
 
         if (Number(activeBorrows[0].total) >= maxBorrowItems) {
             throw new Error(
-                `Borrowing limit reached. Maximum allowed is ${maxBorrowItems} books.`
+                `Borrowing limit reached. Maximum allowed is ${maxBorrowItems} items.`
             );
         }
 
         const [books] = await connection.query(
-            `SELECT book_id, title, available_copies
+            `SELECT book_id, available_copies, is_archived
              FROM books
              WHERE book_id = ?
-        const [items] = await connection.query(
-            `SELECT available_copies
-             FROM items
-             WHERE item_id = ?
              FOR UPDATE`,
-            [itemId]
+            [bookId]
         );
 
-        if (items.length === 0) {
-            throw new Error('Item not found');
+        if (books.length === 0 || Number(books[0].is_archived) === 1) {
+            throw new Error('Book not found');
         }
 
         if (Number(books[0].available_copies) <= 0) {
             throw new Error('No available copies of this book');
         }
 
-        const [dateResult] = await connection.query(
-            `SELECT DATE_ADD(CURDATE(), INTERVAL ? DAY) AS due_date`,
-            [loanDurationDays]
-        );
+        if (!dueDate) {
+            const [dateResult] = await connection.query(
+                `SELECT DATE_ADD(?, INTERVAL ? DAY) AS due_date`,
+                [manilaDate, loanDurationDays]
+            );
 
-        const dueDate = dateResult[0].due_date;
-
-        const [borrowResult] = await connection.query(
-            `INSERT INTO borrow_records
-                (student_id, book_id, borrow_date, due_date, status)
-        if (items[0].available_copies <= 0) {
-            throw new Error('No available copies of this item');
+            dueDate = formatDate(dateResult[0].due_date);
+        } else {
+            dueDate = formatDate(dueDate);
         }
 
         const [borrowResult] = await connection.query(
             `INSERT INTO borrow_records
-             (student_id, item_id, borrow_date, due_date, status)
-             VALUES (?, ?, CURDATE(), ?, 'Borrowed')`,
-            [studentId, itemId, dueDate]
+                (student_id, book_id, borrow_date, due_date, status)
+             VALUES (?, ?, ?, ?, 'Borrowed')`,
+            [studentId, bookId, manilaDate, dueDate]
         );
 
         await borrowDetailModel.createBorrowDetail(
             connection,
             borrowResult.insertId,
-            itemId
+            bookId
         );
 
         await connection.query(
-            `UPDATE items
+            `UPDATE books
              SET available_copies = available_copies - 1
-             WHERE item_id = ?`,
-            [itemId]
+             WHERE book_id = ?`,
+            [bookId]
         );
 
         await connection.query(
@@ -165,7 +202,7 @@ const createBorrowTransaction = async (studentId, itemId, dueDate) => {
             [
                 null,
                 'ISSUE_BOOK',
-                `Book "${books[0].title}" issued to ${students[0].student_name}. Borrow ID: ${borrowResult.insertId}.`
+                `Book ${bookId} issued to ${students[0].student_name}. Borrow ID: ${borrowResult.insertId}.`
             ]
         );
 
@@ -173,26 +210,28 @@ const createBorrowTransaction = async (studentId, itemId, dueDate) => {
 
         return {
             borrow_id: borrowResult.insertId,
+            borrow_date: manilaDate,
             due_date: dueDate
         };
-        return borrowResult.insertId;
 
     } catch (error) {
         await connection.rollback();
         throw error;
+
     } finally {
         connection.release();
     }
 };
 
-// Get all active borrowing records
 const getActiveBorrows = async () => {
-    // Update borrowed records whose due dates have passed
+    const manilaDate = getManilaDate();
+
     await db.query(
         `UPDATE borrow_records
          SET status = 'Overdue'
          WHERE status = 'Borrowed'
-           AND due_date < CURDATE()`
+           AND due_date < ?`,
+        [manilaDate]
     );
 
     const [rows] = await db.query(
@@ -204,8 +243,8 @@ const getActiveBorrows = async () => {
             s.course,
             br.book_id,
             b.title AS book_title,
-            br.borrow_date,
-            br.due_date,
+            DATE_FORMAT(br.borrow_date, '%Y-%m-%d') AS borrow_date,
+            DATE_FORMAT(br.due_date, '%Y-%m-%d') AS due_date,
             br.status
          FROM borrow_records AS br
          INNER JOIN students AS s
@@ -219,28 +258,25 @@ const getActiveBorrows = async () => {
     return rows;
 };
 
-// Get borrowing details by ID
 const getBorrowDetails = async (borrowId) => {
     const [rows] = await db.query(
         `SELECT
             br.borrow_id,
             br.student_id,
+            s.student_number,
             s.student_name,
+            s.course,
             br.book_id,
             b.title AS book_title,
-            br.item_id,
-            i.item_name,
-            br.borrow_date,
-            br.due_date,
-            br.return_date,
+            DATE_FORMAT(br.borrow_date, '%Y-%m-%d') AS borrow_date,
+            DATE_FORMAT(br.due_date, '%Y-%m-%d') AS due_date,
+            DATE_FORMAT(br.return_date, '%Y-%m-%d') AS return_date,
             br.status
          FROM borrow_records AS br
          INNER JOIN students AS s
             ON br.student_id = s.student_id
          INNER JOIN books AS b
             ON br.book_id = b.book_id
-         INNER JOIN items i
-            ON br.item_id = i.item_id
          WHERE br.borrow_id = ?`,
         [borrowId]
     );

@@ -1,3 +1,4 @@
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -38,6 +39,11 @@ const borrowRoutes = require('./routes/borrowRoutes');
 const returnRoutes = require('./routes/returnRoutes');
 const inventoryLogRoutes = require('./routes/inventoryLogRoutes');
 const stockAlertRoutes = require('./routes/stockAlertRoutes');
+
+// ==========================================
+// FINES AND PAYMENTS
+// ==========================================
+const fineRoutes = require('./routes/fineRoutes');
 
 // ==========================================
 // EXPRESS APPLICATION
@@ -119,11 +125,15 @@ app.use('/api/logs', inventoryLogRoutes);
 app.use('/api/alerts', stockAlertRoutes);
 
 // ==========================================
+// FINES AND PAYMENTS API
+// ==========================================
+app.use('/api/fines', fineRoutes);
+
+// ==========================================
 // HOME ROUTES
 // ==========================================
 app.get('/', (req, res) => {
-    res.send('School Library System API - Active');
-  res.redirect('/login/login.html');
+    res.redirect('/login/login.html');
 });
 
 app.get('/reservation', (req, res) => {
@@ -157,6 +167,11 @@ const server = app.listen(PORT, '127.0.0.1', () => {
     console.log('Dashboard: /api/dashboard');
     console.log('Dashboard Test: /api/dashboard-test');
     console.log('');
+    console.log('EXISTING SYSTEM');
+    console.log('Reservations: /api/reservations');
+    console.log('Penalties: /api/penalties');
+    console.log('Policy Reservations: /api/policy-reservations');
+    console.log('');
     console.log('MEMBER B — CATALOG');
     console.log('Books: /api/books');
     console.log('Categories: /api/categories');
@@ -171,6 +186,12 @@ const server = app.listen(PORT, '127.0.0.1', () => {
     console.log('Returns: /api/returns');
     console.log('Activity Logs: /api/logs');
     console.log('Stock Alerts: /api/alerts');
+    console.log('');
+    console.log('FINES AND PAYMENTS');
+    console.log('Fines: /api/fines');
+    console.log('Student Fines: /api/fines/student/:studentId');
+    console.log('Payment History: /api/fines/:fineId/payments');
+    console.log('Record Payment: POST /api/fines/:fineId/payments');
     console.log('====================================');
 });
 

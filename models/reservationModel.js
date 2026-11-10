@@ -1,7 +1,6 @@
 const db = require('../config/db');
 
 class ReservationModel {
-    // --- RESERVATIONS CRUD ---
     static async getAllReservations() {
         const [rows] = await db.query('SELECT * FROM reservations');
         return rows;
@@ -35,7 +34,6 @@ class ReservationModel {
         return result.affectedRows;
     }
 
-    // --- REQUIRED JOIN REPORT: Overdue and Penalty Report (FULL OUTER JOIN via UNION) ---
     static async getOverdueAndPenaltyReport() {
         const query = `
             SELECT r.reservation_id, s.student_id, s.student_name, r.status, p.amount AS fine_amount, p.status AS payment_status

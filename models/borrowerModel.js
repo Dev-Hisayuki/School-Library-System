@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-// Get all borrowers with their student information
+
 const getAllBorrowers = async () => {
     const [rows] = await db.query(`
         SELECT
@@ -19,7 +19,7 @@ const getAllBorrowers = async () => {
     return rows;
 };
 
-// Register a student as a borrower
+
 const createBorrower = async (studentId) => {
     const [result] = await db.query(
         'INSERT INTO borrowers (student_id) VALUES (?)',

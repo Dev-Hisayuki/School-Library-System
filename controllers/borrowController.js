@@ -1,6 +1,5 @@
 const borrowTransactionModel = require('../models/borrowTransactionModel');
 
-// POST /api/borrows
 const createBorrow = async (req, res) => {
     console.log('ISSUE BOOK REQUEST:', req.body);
 
@@ -62,7 +61,6 @@ const createBorrow = async (req, res) => {
     }
 };
 
-// GET /api/borrows
 const getAllActiveBorrows = async (req, res) => {
     try {
         const borrows =
@@ -83,7 +81,6 @@ const getAllActiveBorrows = async (req, res) => {
     }
 };
 
-// GET /api/borrows/:id
 const getBorrowDetails = async (req, res) => {
     try {
         const borrowId = Number(req.params.id);

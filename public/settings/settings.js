@@ -9,6 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const settingValue = document.getElementById('settingValue');
     const settingDescription = document.getElementById('settingDescription');
 
+    const totalSettings = document.getElementById('totalSettings');
+    const databaseStatus = document.getElementById('databaseStatus');
+    const saveButton = document.getElementById('saveSettingBtn');
+
     let settings = [];
 
     // DARK MODE
@@ -21,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (themeToggleBtn) {
             themeToggleBtn.textContent = isDarkMode ? 'On' : 'Off';
+            themeToggleBtn.setAttribute('aria-pressed', String(isDarkMode));
         }
     }
 
@@ -50,6 +55,19 @@ document.addEventListener('DOMContentLoaded', () => {
         })[character]);
     }
 
+    // API RESPONSE HANDLER
+    async function getResponseData(response) {
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.message || `Request failed (${response.status}).`
+            );
+        }
+
+        return result;
+    }
+
     // LOAD SETTINGS
     async function loadSettings() {
         if (!tableBody) return;
@@ -57,25 +75,21 @@ document.addEventListener('DOMContentLoaded', () => {
         tableBody.innerHTML = `
             <tr>
                 <td colspan="5" class="loading-message">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
                     Loading settings...
                 </td>
             </tr>
         `;
 
+        if (databaseStatus) {
+            databaseStatus.textContent = 'Checking...';
+        }
+
         try {
             const response = await fetch('/api/settings');
-            const result = await response.json();
-
-            if (!response.ok || !result.success) {
-                throw new Error(
-                    result.message || 'Unable to load settings.'
-                );
-            }
+            const result = await getResponseData(response);
 
             settings = Array.isArray(result.data) ? result.data : [];
-
-            const totalSettings = document.getElementById('totalSettings');
-            const databaseStatus = document.getElementById('databaseStatus');
 
             if (totalSettings) {
                 totalSettings.textContent = settings.length;
@@ -131,6 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 data-action="edit"
                                 data-id="${Number(setting.id)}"
                                 title="Edit setting"
+                                aria-label="Edit ${escapeHTML(setting.setting_key)}"
                                 type="button">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
@@ -140,6 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 data-action="delete"
                                 data-id="${Number(setting.id)}"
                                 title="Delete setting"
+                                aria-label="Delete ${escapeHTML(setting.setting_key)}"
                                 type="button">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
@@ -151,18 +167,22 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Settings error:', error);
 
-            const databaseStatus = document.getElementById('databaseStatus');
+            settings = [];
 
             if (databaseStatus) {
                 databaseStatus.textContent = 'Error';
             }
 
+            if (totalSettings) {
+                totalSettings.textContent = '0';
+            }
+
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="5" class="empty-message">
-                        Unable to load system settings.
-                        <br>
-                        ${escapeHTML(error.message)}
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <p>Unable to load system settings.</p>
+                        <p>${escapeHTML(error.message)}</p>
                     </td>
                 </tr>
             `;
@@ -177,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('modalTitle').textContent =
             editing ? 'Edit Setting' : 'Add New Setting';
 
-        document.getElementById('saveSettingBtn').textContent =
+        saveButton.textContent =
             editing ? 'Update Setting' : 'Save Setting';
 
         settingKey.disabled = editing;
@@ -190,13 +210,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         settingModal.classList.add('show');
+        settingKey.focus();
     }
 
     // CLOSE MODAL
     function closeModal() {
         settingModal.classList.remove('show');
         settingForm.reset();
+        settingId.value = '';
         settingKey.disabled = false;
+        saveButton.disabled = false;
+        saveButton.textContent = 'Save Setting';
     }
 
     // MODAL EVENTS
@@ -215,32 +239,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && settingModal.classList.contains('show')) {
+            closeModal();
+        }
+    });
+
     // CREATE OR UPDATE SETTING
     settingForm.addEventListener('submit', async event => {
         event.preventDefault();
+
+        if (saveButton.disabled) return;
 
         const id = settingId.value;
         const editing = Boolean(id);
 
         const payload = {
             setting_key: settingKey.value.trim(),
-            setting_value: settingValue.value,
+            setting_value: settingValue.value.trim(),
             description: settingDescription.value.trim()
         };
 
-        if (!editing && !payload.setting_key) {
-            alert('Please enter a setting key.');
+        if (!payload.setting_key || !payload.setting_value) {
+            alert('Please complete the required fields.');
             return;
         }
-
-        const saveButton = document.getElementById('saveSettingBtn');
 
         saveButton.disabled = true;
         saveButton.textContent = 'Saving...';
 
         try {
             const response = await fetch(
-                editing ? `/api/settings/${id}` : '/api/settings',
+                editing ? `/api/settings/${encodeURIComponent(id)}` : '/api/settings',
                 {
                     method: editing ? 'PUT' : 'POST',
                     headers: {
@@ -250,18 +280,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             );
 
-            const result = await response.json();
-
-            if (!response.ok || !result.success) {
-                throw new Error(
-                    result.message || 'Unable to save setting.'
-                );
-            }
+            const result = await getResponseData(response);
 
             closeModal();
             await loadSettings();
 
-            alert(result.message);
+            alert(result.message || 'Setting saved successfully.');
 
         } catch (error) {
             console.error('Save setting error:', error);
@@ -269,8 +293,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } finally {
             saveButton.disabled = false;
-            saveButton.textContent =
-                editing ? 'Update Setting' : 'Save Setting';
+
+            if (settingModal.classList.contains('show')) {
+                saveButton.textContent = editing
+                    ? 'Update Setting'
+                    : 'Save Setting';
+            }
         }
     });
 
@@ -278,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
     tableBody.addEventListener('click', async event => {
         const button = event.target.closest('button[data-action]');
 
-        if (!button) return;
+        if (!button || button.disabled) return;
 
         const id = Number(button.dataset.id);
         const action = button.dataset.action;
@@ -302,20 +330,18 @@ document.addEventListener('DOMContentLoaded', () => {
             button.disabled = true;
 
             try {
-                const response = await fetch(`/api/settings/${id}`, {
-                    method: 'DELETE'
-                });
+                const response = await fetch(
+                    `/api/settings/${encodeURIComponent(id)}`,
+                    {
+                        method: 'DELETE'
+                    }
+                );
 
-                const result = await response.json();
-
-                if (!response.ok || !result.success) {
-                    throw new Error(
-                        result.message || 'Unable to delete setting.'
-                    );
-                }
+                const result = await getResponseData(response);
 
                 await loadSettings();
-                alert(result.message);
+
+                alert(result.message || 'Setting deleted successfully.');
 
             } catch (error) {
                 console.error('Delete setting error:', error);

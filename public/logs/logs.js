@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let activityLogs = [];
     let filteredLogs = [];
 
-    // DARK MODE
+
     const themeToggleBtn = document.getElementById('themeToggleBtn');
 
     function applyTheme() {
@@ -35,13 +35,13 @@ document.addEventListener('DOMContentLoaded', () => {
         applyTheme();
     });
 
-    // LOGOUT
+
     document.getElementById('logoutBtn')?.addEventListener('click', () => {
         localStorage.removeItem('authToken');
         window.location.href = '../login/login.html';
     });
 
-    // HELPER FUNCTIONS
+
     function escapeHTML(value) {
         return String(value ?? '').replace(/[&<>"']/g, character => {
             const entities = {
@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return 'default';
     }
 
-    // SUMMARY CARDS
+
     function updateSummary() {
         const loginCount = activityLogs.filter(log =>
             String(log.action || '').toUpperCase() === 'LOGIN'
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // RENDER ACTIVITY LOGS
+
     function renderLogs(logs) {
         filteredLogs = logs;
 
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `Showing ${logs.length} of ${activityLogs.length} activities`;
     }
 
-    // SEARCH
+
     function searchLogs() {
         const searchTerm = searchInput.value.trim().toLowerCase();
 
@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchInput?.addEventListener('input', searchLogs);
 
-    // LOAD LOGS FROM DATABASE
+
     async function loadLogs() {
         logsTableBody.innerHTML = `
             <tr>
@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // REFRESH
+
     refreshButton?.addEventListener('click', async () => {
         refreshButton.disabled = true;
 
@@ -279,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     });
 
-    // EXPORT CSV
+
     function exportCSV() {
         if (filteredLogs.length === 0) {
             alert('There are no activity logs to export.');
@@ -333,6 +333,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     exportButton?.addEventListener('click', exportCSV);
 
-    // INITIAL LOAD
+
     loadLogs();
 });

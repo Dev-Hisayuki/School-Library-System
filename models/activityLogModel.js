@@ -1,7 +1,6 @@
 const db = require('../config/db');
 
 const ActivityLog = {
-    // Create a new activity log
     create: async (adminId, action, description) => {
         const sql = `
             INSERT INTO activity_logs
@@ -18,7 +17,6 @@ const ActivityLog = {
         return result;
     },
 
-    // Retrieve all activity logs with administrator information
     getAll: async () => {
         const sql = `
             SELECT

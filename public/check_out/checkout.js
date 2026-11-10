@@ -1,6 +1,6 @@
+
 const API_URL = `${window.location.origin}/api/borrows`;
 
-// DOM ELEMENTS
 const tableBody = document.getElementById('borrowingsTableBody');
 const loadingMessage = document.getElementById('loadingMessage');
 const errorMessage = document.getElementById('errorMessage');
@@ -12,9 +12,11 @@ const totalBorrowed = document.getElementById('totalBorrowed');
 const totalOverdue = document.getElementById('totalOverdue');
 const recordCount = document.getElementById('recordCount');
 
+const themeToggleBtn = document.getElementById('themeToggleBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+
 let borrowings = [];
 
-// ESCAPE HTML
 function escapeHTML(value) {
     return String(value ?? '').replace(/[&<>"']/g, character => ({
         '&': '&amp;',
@@ -25,44 +27,105 @@ function escapeHTML(value) {
     })[character]);
 }
 
-// FORMAT DATABASE DATES
-function formatDate(value) {
-    if (!value) return '—';
+// DATE HANDLING - USES THE EXACT DATABASE DATE
+function getDateKey(value) {
+    if (!value) return null;
 
-    const date = new Date(value);
+    const match = String(value).match(/^(\d{4}-\d{2}-\d{2})/);
 
-    if (Number.isNaN(date.getTime())) {
-        return '—';
+    if (!match) return null;
+
+    const dateKey = match[1];
+    const [year, month, day] = dateKey.split('-').map(Number);
+
+    const date = new Date(Date.UTC(year, month - 1, day));
+
+    if (
+        date.getUTCFullYear() !== year ||
+        date.getUTCMonth() !== month - 1 ||
+        date.getUTCDate() !== day
+    ) {
+        return null;
     }
 
-    return date.toLocaleDateString('en-PH', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        timeZone: 'Asia/Manila'
-    });
+    return dateKey;
 }
 
-// UPDATE SUMMARY CARDS
+function formatDate(value) {
+    const dateKey = getDateKey(value);
+
+    if (!dateKey) return '—';
+
+    const [year, month, day] = dateKey.split('-').map(Number);
+
+    const months = [
+        'Jan', 'Feb', 'Mar', 'Apr',
+        'May', 'Jun', 'Jul', 'Aug',
+        'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+
+    return `${months[month - 1]} ${day}, ${year}`;
+}
+
+function isDateOverdue(dueDate) {
+    const dueDateKey = getDateKey(dueDate);
+
+    if (!dueDateKey) return false;
+
+    const todayKey = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Manila',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).format(new Date());
+
+    return dueDateKey < todayKey;
+}
+
+// BORROWING STATUS
+function getDisplayStatus(record) {
+    if (record.status === 'Returned') {
+        return 'Returned';
+    }
+
+    if (
+        record.status === 'Overdue' ||
+        isDateOverdue(record.due_date)
+    ) {
+        return 'Overdue';
+    }
+
+    return record.status || 'Borrowed';
+}
+
+// SUMMARY CARDS
 function updateSummary(records) {
+    const activeRecords = records.filter(record => {
+        return getDisplayStatus(record) !== 'Returned';
+    });
+
+    const borrowedRecords = activeRecords.filter(record => {
+        return getDisplayStatus(record) === 'Borrowed';
+    });
+
+    const overdueRecords = activeRecords.filter(record => {
+        return getDisplayStatus(record) === 'Overdue';
+    });
+
     if (totalActive) {
-        totalActive.textContent = records.length;
+        totalActive.textContent = activeRecords.length;
     }
 
     if (totalBorrowed) {
-        totalBorrowed.textContent = records.filter(
-            record => record.status === 'Borrowed'
-        ).length;
+        totalBorrowed.textContent = borrowedRecords.length;
     }
 
     if (totalOverdue) {
-        totalOverdue.textContent = records.filter(
-            record => record.status === 'Overdue'
-        ).length;
+        totalOverdue.textContent = overdueRecords.length;
     }
 }
 
-// DISPLAY BORROWING RECORDS
+// RENDER BORROWING RECORDS
 function renderBorrowings(records) {
     if (!tableBody) return;
 
@@ -71,7 +134,7 @@ function renderBorrowings(records) {
             <tr>
                 <td colspan="6" class="empty-cell">
                     <i class="fa-solid fa-book-open"></i>
-                    <p>No active borrowing records found.</p>
+                    <p>No borrowing records found.</p>
                 </td>
             </tr>
         `;
@@ -84,8 +147,22 @@ function renderBorrowings(records) {
     }
 
     tableBody.innerHTML = records.map(record => {
-        const isOverdue = record.status === 'Overdue';
-        const statusClass = isOverdue ? 'overdue' : 'borrowed';
+        const status = getDisplayStatus(record);
+
+        const isOverdue = status === 'Overdue';
+        const isReturned = status === 'Returned';
+
+        const statusClass = isReturned
+            ? 'returned'
+            : isOverdue
+                ? 'overdue'
+                : 'borrowed';
+
+        const statusIcon = isReturned
+            ? 'fa-circle-check'
+            : isOverdue
+                ? 'fa-triangle-exclamation'
+                : 'fa-clock';
 
         return `
             <tr>
@@ -95,31 +172,30 @@ function renderBorrowings(records) {
 
                 <td>
                     <span class="student-name">
-                        ${escapeHTML(record.student_name)}
+                        ${escapeHTML(record.student_name || 'Unknown Student')}
                     </span>
 
                     <span class="student-number">
-                        ${escapeHTML(record.student_number)}
+                        ${escapeHTML(record.student_number || '—')}
                     </span>
                 </td>
 
                 <td class="book-title">
-                    ${escapeHTML(record.book_title)}
+                    ${escapeHTML(record.book_title || 'Unknown Book')}
                 </td>
 
-                <td>${formatDate(record.borrow_date)}</td>
+                <td>
+                    ${formatDate(record.borrow_date)}
+                </td>
 
-                <td>${formatDate(record.due_date)}</td>
+                <td>
+                    ${formatDate(record.due_date)}
+                </td>
 
                 <td>
                     <span class="status-badge ${statusClass}">
-                        <i class="fa-solid ${
-                            isOverdue
-                                ? 'fa-triangle-exclamation'
-                                : 'fa-clock'
-                        }"></i>
-
-                        ${escapeHTML(record.status)}
+                        <i class="fa-solid ${statusIcon}"></i>
+                        ${escapeHTML(status)}
                     </span>
                 </td>
             </tr>
@@ -132,7 +208,7 @@ function renderBorrowings(records) {
     }
 }
 
-// SEARCH BORROWING RECORDS
+// SEARCH AND FILTER
 function filterBorrowings() {
     if (!searchInput) {
         renderBorrowings(borrowings);
@@ -147,9 +223,9 @@ function filterBorrowings() {
             record.student_name,
             record.student_number,
             record.book_title,
-            record.borrow_date,
-            record.due_date,
-            record.status
+            formatDate(record.borrow_date),
+            formatDate(record.due_date),
+            getDisplayStatus(record)
         ];
 
         return searchableValues.some(value =>
@@ -177,7 +253,13 @@ async function loadBorrowings() {
         refreshBtn.disabled = true;
     }
 
-    tableBody.innerHTML = '';
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="6" class="empty-cell">
+                Loading borrowing records...
+            </td>
+        </tr>
+    `;
 
     try {
         const response = await fetch(API_URL, {
@@ -187,7 +269,13 @@ async function loadBorrowings() {
             }
         });
 
-        const result = await response.json();
+        let result;
+
+        try {
+            result = await response.json();
+        } catch {
+            throw new Error('The server returned an invalid response.');
+        }
 
         if (!response.ok || !result.success) {
             throw new Error(
@@ -211,7 +299,8 @@ async function loadBorrowings() {
         tableBody.innerHTML = `
             <tr>
                 <td colspan="6" class="empty-cell">
-                    Unable to load borrowing records.
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <p>Unable to load borrowing records.</p>
                 </td>
             </tr>
         `;
@@ -238,9 +327,7 @@ async function loadBorrowings() {
     }
 }
 
-// DARK MODE
-const themeToggleBtn = document.getElementById('themeToggleBtn');
-
+// THEME
 function applyTheme() {
     const isDark = localStorage.getItem('theme') === 'dark';
 
@@ -253,37 +340,30 @@ function applyTheme() {
 
 applyTheme();
 
-if (themeToggleBtn) {
-    themeToggleBtn.addEventListener('click', () => {
-        const isDark = document.body.classList.contains('dark-mode');
+themeToggleBtn?.addEventListener('click', () => {
+    const isDark = document.body.classList.contains('dark-mode');
 
-        localStorage.setItem(
-            'theme',
-            isDark ? 'light' : 'dark'
-        );
+    localStorage.setItem(
+        'theme',
+        isDark ? 'light' : 'dark'
+    );
 
-        applyTheme();
-    });
-}
+    applyTheme();
+});
 
 // LOGOUT
-const logoutBtn = document.getElementById('logoutBtn');
+logoutBtn?.addEventListener('click', () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('admin');
 
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-        localStorage.removeItem('authToken');
-        window.location.href = '../login/login.html';
-    });
-}
+    sessionStorage.clear();
+
+    window.location.href = '../login/login.html';
+});
 
 // EVENT LISTENERS
-if (refreshBtn) {
-    refreshBtn.addEventListener('click', loadBorrowings);
-}
-
-if (searchInput) {
-    searchInput.addEventListener('input', filterBorrowings);
-}
+refreshBtn?.addEventListener('click', loadBorrowings);
+searchInput?.addEventListener('input', filterBorrowings);
 
 // INITIAL LOAD
 loadBorrowings();

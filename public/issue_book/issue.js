@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', () => {
     const studentSelect = document.getElementById('studentSelect');
     const bookSelect = document.getElementById('bookSelect');
@@ -5,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const issueBtn = document.getElementById('issueBtn');
     const messageBox = document.getElementById('messageBox');
 
-    // DARK MODE
+
     const themeToggleBtn = document.getElementById('themeToggleBtn');
 
     function applyTheme() {
@@ -29,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // LOGOUT
+
     const logoutBtn = document.getElementById('logoutBtn');
 
     if (logoutBtn) {
@@ -39,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // DISPLAY MESSAGES
+
     function showMessage(message, type) {
         if (!messageBox) return;
 
@@ -48,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         messageBox.hidden = false;
     }
 
-    // FORMAT API DATE
+
     function formatDate(dateValue) {
         if (!dateValue) return 'Not available';
 
@@ -66,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // LOAD REGISTERED BORROWERS
+
     async function loadStudents() {
         try {
             studentSelect.innerHTML =
@@ -111,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // LOAD AVAILABLE BOOKS
+
     async function loadBooks() {
         try {
             bookSelect.innerHTML =
@@ -137,12 +138,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 option.value = book.book_id;
 
                 option.textContent =
-                    `${book.book_title} (${book.available_copies} available)`;
+                    `${book.title} (${book.available_copies} available)`;
 
                 if (Number(book.available_copies) <= 0) {
                     option.disabled = true;
                     option.textContent =
-                        `${book.book_title} (Unavailable)`;
+                        `${book.title} (Unavailable)`;
                 }
 
                 bookSelect.appendChild(option);
@@ -163,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // SUBMIT BORROWING TRANSACTION
+
     if (issueForm) {
         issueForm.addEventListener('submit', async event => {
             event.preventDefault();
@@ -226,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // INITIAL LOADING
+
     loadStudents();
     loadBooks();
 });

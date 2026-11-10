@@ -1,3 +1,4 @@
+
 /* ==========================================
    STUDENTS PAGE - MATCHING PUBLISHERS PAGE
 ========================================== */
@@ -703,6 +704,12 @@
     border-color: var(--accent-blue);
 }
 
+.action-btn.fines:hover {
+    color: #d97706;
+    border-color: #d97706;
+    background: rgba(217, 119, 6, 0.08);
+}
+
 .action-btn.delete:hover {
     color: #dc2626;
     border-color: #dc2626;
@@ -849,6 +856,200 @@ body.modal-open {
 }
 
 /* ==========================================
+   FINES MODAL
+========================================== */
+
+.fines-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+}
+
+.fines-modal.show {
+    display: flex;
+}
+
+.fines-modal-content {
+    position: relative;
+    width: 100%;
+    max-width: 850px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 28px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    animation: modalAppear 0.2s ease;
+}
+
+.fines-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.fines-modal-header h2 {
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    margin-bottom: 6px;
+}
+
+.fines-modal-header p {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.fines-modal-close {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 8px;
+    background: var(--bg-main);
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.fines-modal-close:hover {
+    color: #dc2626;
+}
+
+.fines-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.fines-summary-card {
+    padding: 16px;
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+}
+
+.fines-summary-card span {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.fines-summary-card strong {
+    color: var(--text-primary);
+    font-size: 1.2rem;
+}
+
+.fines-section {
+    margin-top: 22px;
+}
+
+.fines-section h3 {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+}
+
+.fines-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.fines-table {
+    width: 100%;
+    min-width: 650px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.fines-table th {
+    padding: 12px;
+    background: var(--bg-main);
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    white-space: nowrap;
+}
+
+.fines-table td {
+    padding: 13px 12px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-size: 0.78rem;
+}
+
+.fines-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.fine-status {
+    display: inline-flex;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.fine-status.unpaid {
+    color: #b91c1c;
+    background: #fee2e2;
+}
+
+.fine-status.partial {
+    color: #b45309;
+    background: #fef3c7;
+}
+
+.fine-status.paid {
+    color: #047857;
+    background: #d1fae5;
+}
+
+.fine-payment-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    padding: 18px;
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+}
+
+.fine-payment-form .form-group {
+    margin-bottom: 0;
+}
+
+.fine-payment-form .form-actions {
+    grid-column: 1 / -1;
+    margin-top: 5px;
+}
+
+.fines-empty {
+    padding: 25px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.fines-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 22px;
+}
+
+/* ==========================================
    DARK MODE
 ========================================== */
 
@@ -892,6 +1093,21 @@ body.dark-mode .status-student {
 body.dark-mode .delete-modal-icon {
     background: rgba(220, 38, 38, 0.15);
     color: #f87171;
+}
+
+body.dark-mode .fine-status.unpaid {
+    color: #fca5a5;
+    background: #7f1d1d;
+}
+
+body.dark-mode .fine-status.partial {
+    color: #fcd34d;
+    background: #78350f;
+}
+
+body.dark-mode .fine-status.paid {
+    color: #6ee7b7;
+    background: #064e3b;
 }
 
 /* ==========================================
@@ -1031,6 +1247,31 @@ body.dark-mode .delete-modal-icon {
     }
 
     .delete-modal-actions button {
+        width: 100%;
+    }
+
+    .fines-modal {
+        padding: 10px;
+    }
+
+    .fines-modal-content {
+        padding: 20px 15px;
+        max-height: 95vh;
+    }
+
+    .fines-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .fine-payment-form {
+        grid-template-columns: 1fr;
+    }
+
+    .fine-payment-form .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .fine-payment-form .form-actions button {
         width: 100%;
     }
 }

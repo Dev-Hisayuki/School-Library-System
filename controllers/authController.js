@@ -12,7 +12,6 @@ const authController = {
         try {
             const { username, password } = req.body;
 
-            // Validate input
             if (!username || !password) {
                 return res.status(400).json({
                     success: false,
@@ -20,7 +19,6 @@ const authController = {
                 });
             }
 
-            // Find administrator
             const admin = await Admin.findByUsername(username.trim());
 
             if (!admin || !admin.is_active) {
@@ -30,7 +28,6 @@ const authController = {
                 });
             }
 
-            // Expected password format: scrypt$salt$hash
             const parts = admin.password_hash.split('$');
 
             if (parts.length !== 3 || parts[0] !== 'scrypt') {
@@ -60,7 +57,6 @@ const authController = {
                 });
             }
 
-            // Record successful login
             await db.execute(
                 `INSERT INTO activity_logs (admin_id, action, description)
                  VALUES (?, ?, ?)`,
@@ -71,8 +67,6 @@ const authController = {
                 ]
             );
 
-            // Temporary login response.
-            // Session/token management will be added separately.
             return res.status(200).json({
                 success: true,
                 message: 'Login successful.',

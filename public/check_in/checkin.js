@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', () => {
     const API_URL = `${window.location.origin}/api/returns`;
 
@@ -5,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logoutBtn');
     const checkinForm = document.getElementById('checkinForm');
     const activeSelect = document.getElementById('checkinActiveSelect');
+    const returnDateInput = document.getElementById('returnDate');
 
     const quantityInput = checkinForm?.querySelector('input[type="number"]');
     const conditionSelect = checkinForm?.querySelectorAll('select')[1];
@@ -13,7 +15,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let confirmationCallback = null;
 
-    // CUSTOM DIALOG STYLES
+    function getManilaDate() {
+        const parts = new Intl.DateTimeFormat('en-CA', {
+            timeZone: 'Asia/Manila',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }).formatToParts(new Date());
+
+        const dateParts = {};
+
+        parts.forEach(part => {
+            dateParts[part.type] = part.value;
+        });
+
+        return `${dateParts.year}-${dateParts.month}-${dateParts.day}`;
+    }
+
+    function setDefaultReturnDate() {
+        if (!returnDateInput) return;
+
+        const today = getManilaDate();
+
+        returnDateInput.value = today;
+        returnDateInput.max = today;
+    }
+
+    setDefaultReturnDate();
+
     const dialogStyles = document.createElement('style');
 
     dialogStyles.textContent = `
@@ -186,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dialogCancel = dialogOverlay.querySelector('#dialogCancel');
     const dialogConfirm = dialogOverlay.querySelector('#dialogConfirm');
 
-    // CLOSE DIALOG
+
     function closeDialog(value = false) {
         dialogOverlay.hidden = true;
 
@@ -196,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (callback) callback(value);
     }
 
-    // SHOW CONFIRMATION
+
     function showConfirmation(message) {
         return new Promise(resolve => {
             confirmationCallback = resolve;
@@ -214,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // SHOW INFORMATION MESSAGE
+
     function showDialog(message, type = 'success') {
         confirmationCallback = null;
 
@@ -259,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // DARK MODE
+
     function applyTheme() {
         const isDarkMode = localStorage.getItem('theme') === 'dark';
 
@@ -280,13 +309,13 @@ document.addEventListener('DOMContentLoaded', () => {
         applyTheme();
     });
 
-    // LOGOUT
+
     logoutBtn?.addEventListener('click', () => {
         localStorage.removeItem('authToken');
         window.location.href = '../login/login.html';
     });
 
-    // LOAD ACTIVE BORROWINGS
+
     async function loadActiveBorrowings() {
         if (!activeSelect) return;
 
@@ -327,6 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     `${record.remaining_quantity} remaining`;
 
                 option.dataset.remaining = record.remaining_quantity;
+                option.dataset.borrowDate = String(record.borrow_date).slice(0, 10);
 
                 activeSelect.appendChild(option);
             });
@@ -351,35 +381,77 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // UPDATE QUANTITY LIMIT
+
     function updateQuantityLimit() {
         const selectedOption = activeSelect?.selectedOptions[0];
 
-        if (!selectedOption || !quantityInput) return;
+        if (!selectedOption) return;
 
         const remaining = Number(selectedOption.dataset.remaining || 1);
 
-        quantityInput.max = remaining;
-        quantityInput.value = 1;
-        quantityInput.min = 1;
+        if (quantityInput) {
+            quantityInput.max = remaining;
+            quantityInput.value = 1;
+            quantityInput.min = 1;
+        }
+
+        if (returnDateInput) {
+            const borrowDate = selectedOption.dataset.borrowDate;
+            const today = getManilaDate();
+
+            returnDateInput.min = borrowDate || '';
+            returnDateInput.max = today;
+
+            if (
+                !returnDateInput.value ||
+                returnDateInput.value < borrowDate ||
+                returnDateInput.value > today
+            ) {
+                returnDateInput.value = today;
+            }
+        }
     }
 
     activeSelect?.addEventListener('change', updateQuantityLimit);
 
-    // PROCESS RETURN
+
     checkinForm?.addEventListener('submit', async event => {
         event.preventDefault();
 
         const borrowId = Number(activeSelect?.value);
         const quantityReturned = Number(quantityInput?.value);
         const itemCondition = conditionSelect?.value;
+        const returnDate = returnDateInput?.value;
         const remarks = remarksInput?.value.trim() || '';
 
         const selectedOption = activeSelect?.selectedOptions[0];
         const remaining = Number(selectedOption?.dataset.remaining || 0);
+        const borrowDate = selectedOption?.dataset.borrowDate || '';
+        const today = getManilaDate();
 
         if (!borrowId) {
             showDialog('Please select an active borrowing record.', 'error');
+            return;
+        }
+
+        if (!returnDate) {
+            showDialog('Please select a return date.', 'error');
+            return;
+        }
+
+        if (returnDate < borrowDate) {
+            showDialog(
+                'Return date cannot be earlier than the borrow date.',
+                'error'
+            );
+            return;
+        }
+
+        if (returnDate > today) {
+            showDialog(
+                'Return date cannot be later than today.',
+                'error'
+            );
             return;
         }
 
@@ -401,7 +473,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const confirmed = await showConfirmation(
-            `Are you sure you want to return ${quantityReturned} copy/copies?`
+            `Are you sure you want to return ${quantityReturned} copy/copies on ${returnDate}?`
         );
 
         if (!confirmed) return;
@@ -419,6 +491,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({
                     borrowId,
+                    returnDate,
                     quantityReturned,
                     itemCondition,
                     remarks
@@ -435,9 +508,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             checkinForm.reset();
 
-            if (remarksInput) {
-                remarksInput.value = '';
-            }
+            setDefaultReturnDate();
 
             await loadActiveBorrowings();
 
@@ -452,13 +523,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } finally {
             if (submitBtn) {
-                submitBtn.textContent = 'Complete Return';
+                submitBtn.innerHTML =
+                    '<i class="fa-solid fa-check"></i> Complete Return';
+
                 submitBtn.disabled = activeSelect?.disabled ||
                     !activeSelect?.value;
             }
         }
     });
 
-    // INITIAL LOAD
+
     loadActiveBorrowings();
 });

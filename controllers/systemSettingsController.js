@@ -1,9 +1,12 @@
+
 const SystemSettingsModel = require('../models/systemSettingsModel');
+const db = require('../config/db');
 
 const numericSettings = {
     overdue_fine_per_day: {
         min: 0,
-        max: 10000
+        max: 10000,
+        decimal: true
     },
     max_borrow_items: {
         min: 1,
@@ -23,8 +26,16 @@ const numericSettings = {
     }
 };
 
+const protectedSettingKeys = SystemSettingsModel.defaultSettings.map(
+    setting => setting.setting_key
+);
+
 function validateSettingValue(key, value) {
-    if (value === undefined || value === null || String(value).trim() === '') {
+    if (
+        value === undefined ||
+        value === null ||
+        String(value).trim() === ''
+    ) {
         return 'Setting value is required.';
     }
 
@@ -34,22 +45,26 @@ function validateSettingValue(key, value) {
         return null;
     }
 
-    const number = Number(value);
+    const valueString = String(value).trim();
+
+    const validFormat = rule.decimal
+        ? /^\d+(\.\d{1,2})?$/.test(valueString)
+        : /^\d+$/.test(valueString);
+
+    if (!validFormat) {
+        return rule.decimal
+            ? 'The overdue fine must be a valid amount with no more than two decimal places.'
+            : `${key} must be a whole number.`;
+    }
+
+    const number = Number(valueString);
 
     if (
         !Number.isFinite(number) ||
         number < rule.min ||
         number > rule.max
     ) {
-        return `${key} must be a number between ${rule.min} and ${rule.max}.`;
-    }
-
-    if (!Number.isInteger(number) && key !== 'overdue_fine_per_day') {
-        return `${key} must be a whole number.`;
-    }
-
-    if (key === 'overdue_fine_per_day' && !/^\d+(\.\d{1,2})?$/.test(String(value))) {
-        return 'The overdue fine must have no more than two decimal places.';
+        return `${key} must be between ${rule.min} and ${rule.max}.`;
     }
 
     return null;
@@ -132,7 +147,7 @@ exports.updateSetting = async (req, res) => {
             });
         }
 
-        const [existingSettings] = await require('../config/db').execute(
+        const [existingSettings] = await db.execute(
             'SELECT setting_key FROM system_settings WHERE id = ?',
             [id]
         );
@@ -187,14 +202,28 @@ exports.deleteSetting = async (req, res) => {
             });
         }
 
-        const deleted = await SystemSettingsModel.deleteSetting(id);
+        const [existingSettings] = await db.execute(
+            'SELECT setting_key FROM system_settings WHERE id = ?',
+            [id]
+        );
 
-        if (!deleted) {
+        if (existingSettings.length === 0) {
             return res.status(404).json({
                 success: false,
                 message: 'Setting not found.'
             });
         }
+
+        const settingKey = existingSettings[0].setting_key;
+
+        if (protectedSettingKeys.includes(settingKey)) {
+            return res.status(403).json({
+                success: false,
+                message: 'Default system settings cannot be deleted.'
+            });
+        }
+
+        await SystemSettingsModel.deleteSetting(id);
 
         res.status(200).json({
             success: true,

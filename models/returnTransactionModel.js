@@ -1,6 +1,38 @@
+
 const db = require('../config/db');
 
+function getManilaDate() {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Manila',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).formatToParts(new Date());
+
+    const values = {};
+
+    parts.forEach(part => {
+        values[part.type] = part.value;
+    });
+
+    return `${values.year}-${values.month}-${values.day}`;
+}
+
+function isValidDateString(date) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        return false;
+    }
+
+    const parsed = new Date(`${date}T00:00:00Z`);
+
+    return (
+        !Number.isNaN(parsed.getTime()) &&
+        parsed.toISOString().slice(0, 10) === date
+    );
+}
+
 const ReturnTransaction = {
+
     getActiveBorrowings: async () => {
         const sql = `
             SELECT
@@ -10,8 +42,8 @@ const ReturnTransaction = {
                 s.student_name,
                 br.book_id,
                 b.title AS book_title,
-                br.borrow_date,
-                br.due_date,
+                DATE_FORMAT(br.borrow_date, '%Y-%m-%d') AS borrow_date,
+                DATE_FORMAT(br.due_date, '%Y-%m-%d') AS due_date,
                 br.status,
                 bd.quantity AS borrowed_quantity,
                 COALESCE(SUM(rd.quantity_returned), 0) AS returned_quantity,
@@ -62,13 +94,55 @@ const ReturnTransaction = {
         try {
             await connection.beginTransaction();
 
-            // Lock the borrowing record.
+            const normalizedBorrowId = Number(borrowId);
+            const normalizedQuantity = Number(quantityReturned);
+
+            if (
+                !Number.isInteger(normalizedBorrowId) ||
+                normalizedBorrowId < 1
+            ) {
+                throw new Error('Invalid borrowing record ID.');
+            }
+
+            if (
+                !Number.isInteger(normalizedQuantity) ||
+                normalizedQuantity < 1
+            ) {
+                throw new Error(
+                    'Return quantity must be a positive whole number.'
+                );
+            }
+
+            if (!['Good', 'Damaged', 'Lost'].includes(itemCondition)) {
+                throw new Error('Invalid item condition.');
+            }
+
+            const formattedDate = returnDate
+                ? String(returnDate).slice(0, 10)
+                : getManilaDate();
+
+            if (!isValidDateString(formattedDate)) {
+                throw new Error('Invalid return date.');
+            }
+
+            const today = getManilaDate();
+
+            if (formattedDate > today) {
+                throw new Error('Return date cannot be later than today.');
+            }
+
             const [borrowRows] = await connection.execute(
-                `SELECT borrow_id, book_id, due_date, status
+                `SELECT
+                    borrow_id,
+                    student_id,
+                    book_id,
+                    DATE_FORMAT(borrow_date, '%Y-%m-%d') AS borrow_date,
+                    DATE_FORMAT(due_date, '%Y-%m-%d') AS due_date,
+                    status
                  FROM borrow_records
                  WHERE borrow_id = ?
                  FOR UPDATE`,
-                [borrowId]
+                [normalizedBorrowId]
             );
 
             if (borrowRows.length === 0) {
@@ -81,12 +155,24 @@ const ReturnTransaction = {
                 throw new Error('This borrowing record is not active.');
             }
 
-            // Get the original borrowed quantity.
+            const actualBorrowDate = borrow.borrow_date;
+
+            if (!isValidDateString(actualBorrowDate)) {
+                throw new Error('Invalid borrowing date in database.');
+            }
+
+            if (formattedDate < actualBorrowDate) {
+                throw new Error(
+                    'Return date cannot be earlier than the borrow date.'
+                );
+            }
+
+
             const [detailRows] = await connection.execute(
                 `SELECT quantity
                  FROM borrow_details
                  WHERE borrow_id = ? AND book_id = ?`,
-                [borrowId, borrow.book_id]
+                [normalizedBorrowId, borrow.book_id]
             );
 
             if (detailRows.length === 0) {
@@ -95,51 +181,45 @@ const ReturnTransaction = {
 
             const borrowedQuantity = Number(detailRows[0].quantity);
 
-            // Calculate how many copies have already been returned.
+
             const [returnedRows] = await connection.execute(
                 `SELECT COALESCE(SUM(rd.quantity_returned), 0) AS returned_quantity
                  FROM return_details rd
                  INNER JOIN return_records rr
                     ON rr.return_id = rd.return_id
                  WHERE rr.borrow_id = ? AND rd.book_id = ?`,
-                [borrowId, borrow.book_id]
+                [normalizedBorrowId, borrow.book_id]
             );
 
-            const alreadyReturned = Number(returnedRows[0].returned_quantity);
+            const alreadyReturned = Number(
+                returnedRows[0].returned_quantity
+            );
+
             const remainingQuantity = borrowedQuantity - alreadyReturned;
 
-            if (!Number.isInteger(Number(quantityReturned)) ||
-                Number(quantityReturned) < 1 ||
-                Number(quantityReturned) > remainingQuantity) {
+            if (remainingQuantity <= 0) {
+                throw new Error(
+                    'All borrowed copies have already been returned.'
+                );
+            }
+
+            if (normalizedQuantity > remainingQuantity) {
                 throw new Error(
                     `Invalid return quantity. Remaining copies: ${remainingQuantity}.`
                 );
             }
 
-            if (!['Good', 'Damaged', 'Lost'].includes(itemCondition)) {
-                throw new Error('Invalid item condition.');
-            }
 
             const finalReturn =
-                alreadyReturned + Number(quantityReturned) >= borrowedQuantity;
+                alreadyReturned + normalizedQuantity === borrowedQuantity;
 
-            const actualReturnDate = returnDate
-                ? new Date(returnDate)
-                : new Date();
 
-            if (Number.isNaN(actualReturnDate.getTime())) {
-                throw new Error('Invalid return date.');
-            }
-
-            const formattedDate = actualReturnDate.toISOString().slice(0, 10);
-
-            // Create the return record.
-            const [returnResult] = await connection.execute(
+                const [returnResult] = await connection.execute(
                 `INSERT INTO return_records
                     (borrow_id, processed_by, return_date, remarks)
                  VALUES (?, ?, ?, ?)`,
                 [
-                    borrowId,
+                    normalizedBorrowId,
                     processedBy || null,
                     formattedDate,
                     remarks || null
@@ -148,7 +228,7 @@ const ReturnTransaction = {
 
             const returnId = returnResult.insertId;
 
-            // Save the returned book details.
+
             await connection.execute(
                 `INSERT INTO return_details
                     (return_id, book_id, quantity_returned, item_condition)
@@ -156,31 +236,32 @@ const ReturnTransaction = {
                 [
                     returnId,
                     borrow.book_id,
-                    Number(quantityReturned),
+                    normalizedQuantity,
                     itemCondition
                 ]
             );
 
-            // Only books in good condition become available again.
+
             if (itemCondition === 'Good') {
                 await connection.execute(
                     `UPDATE books
                      SET available_copies = available_copies + ?
                      WHERE book_id = ?`,
-                    [Number(quantityReturned), borrow.book_id]
+                    [normalizedQuantity, borrow.book_id]
                 );
             }
 
-            // Update the borrowing status after the final return.
+
             if (finalReturn) {
                 await connection.execute(
                     `UPDATE borrow_records
-                     SET status = 'Returned', return_date = ?
+                     SET status = 'Returned',
+                         return_date = ?
                      WHERE borrow_id = ?`,
-                    [formattedDate, borrowId]
+                    [formattedDate, normalizedBorrowId]
                 );
 
-                // Read the configured overdue fine rate.
+
                 const [settings] = await connection.execute(
                     `SELECT setting_value
                      FROM system_settings
@@ -192,15 +273,24 @@ const ReturnTransaction = {
                     ? Number(settings[0].setting_value)
                     : 0;
 
-                const dueDate = new Date(`${borrow.due_date}T00:00:00`);
-                const returnedDate = new Date(`${formattedDate}T00:00:00`);
+                if (!Number.isFinite(finePerDay) || finePerDay < 0) {
+                    throw new Error('Invalid overdue fine setting.');
+                }
+
+                const dueDate = new Date(`${borrow.due_date}T00:00:00Z`);
+                const actualReturnDate = new Date(`${formattedDate}T00:00:00Z`);
 
                 const overdueDays = Math.max(
                     0,
-                    Math.floor((returnedDate - dueDate) / 86400000)
+                    Math.floor(
+                        (actualReturnDate.getTime() - dueDate.getTime()) /
+                        86400000
+                    )
                 );
 
-                const fineAmount = overdueDays * finePerDay;
+                const fineAmount = Number(
+                    (overdueDays * finePerDay).toFixed(2)
+                );
 
                 if (fineAmount > 0) {
                     await connection.execute(
@@ -208,7 +298,7 @@ const ReturnTransaction = {
                             (borrow_id, student_id, amount, reason, status)
                          VALUES (?, ?, ?, ?, 'Unpaid')`,
                         [
-                            borrowId,
+                            normalizedBorrowId,
                             borrow.student_id,
                             fineAmount,
                             `Overdue return: ${overdueDays} day(s)`
@@ -216,7 +306,7 @@ const ReturnTransaction = {
                     );
                 }
             } else {
-                // Keep the record overdue if its due date has passed.
+
                 await connection.execute(
                     `UPDATE borrow_records
                      SET status = CASE
@@ -224,11 +314,10 @@ const ReturnTransaction = {
                         ELSE 'Borrowed'
                      END
                      WHERE borrow_id = ?`,
-                    [formattedDate, borrowId]
+                    [formattedDate, normalizedBorrowId]
                 );
             }
 
-            // Record the activity using the same transaction.
             await connection.execute(
                 `INSERT INTO activity_logs
                     (admin_id, action, description)
@@ -236,7 +325,7 @@ const ReturnTransaction = {
                 [
                     processedBy || null,
                     'RETURN_ITEM',
-                    `Returned ${quantityReturned} ${itemCondition} copy/copies for borrowing record #${borrowId}. Return ID #${returnId}.`
+                    `Returned ${normalizedQuantity} ${itemCondition} copy/copies for borrowing record #${normalizedBorrowId}. Return ID #${returnId}.`
                 ]
             );
 
@@ -244,9 +333,9 @@ const ReturnTransaction = {
 
             return {
                 returnId,
-                borrowId,
-                quantityReturned: Number(quantityReturned),
-                remainingQuantity: remainingQuantity - Number(quantityReturned),
+                borrowId: normalizedBorrowId,
+                quantityReturned: normalizedQuantity,
+                remainingQuantity: remainingQuantity - normalizedQuantity,
                 fullyReturned: finalReturn
             };
 
@@ -288,33 +377,6 @@ const ReturnTransaction = {
         const [rows] = await db.execute(sql);
         return rows;
     }
-  create: async (borrowId, processedBy, returnDate) => {
-    const sql = `INSERT INTO return_transactions (borrow_id, processed_by, return_date) VALUES (?, ?, ?)`;
-    const [result] = await db.execute(sql, [borrowId, processedBy, returnDate || new Date()]);
-    return result.insertId;
-  },
-
-  getAllWithDetails: async () => {
-    const sql = `
-      SELECT 
-        rt.id AS return_id,
-        rt.return_date,
-        u.username AS processed_by,
-        s.student_name AS borrower_name,
-        i.item_name,
-        rd.quantity_returned,
-        rd.item_condition
-      FROM return_transactions rt
-      INNER JOIN users u ON rt.processed_by = u.id
-      INNER JOIN borrow_records br ON rt.borrow_id = br.borrow_id
-      INNER JOIN students s ON br.student_id = s.student_id
-      INNER JOIN items i ON br.item_id = i.item_id
-      INNER JOIN return_details rd ON rt.id = rd.return_id
-      ORDER BY rt.return_date DESC
-    `;
-    const [rows] = await db.execute(sql);
-    return rows;
-  }
 };
 
 module.exports = ReturnTransaction;

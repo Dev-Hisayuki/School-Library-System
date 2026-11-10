@@ -1,7 +1,5 @@
 
-/* ==========================================
-   PUBLISHERS PAGE - MATCHING BOOKS PAGE
-========================================== */
+
 
 .app-container {
     display: flex;
@@ -10,9 +8,7 @@
     overflow: hidden;
 }
 
-/* ==========================================
-   SIDEBAR
-========================================== */
+
 
 .sidebar {
     width: 250px;
@@ -84,9 +80,7 @@
     font-weight: 600;
 }
 
-/* ==========================================
-   SIDEBAR FOOTER
-========================================== */
+
 
 .sidebar-footer {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -134,9 +128,7 @@
     color: #f87171;
 }
 
-/* ==========================================
-   MAIN CONTENT AND TOPBAR
-========================================== */
+
 
 .main-content {
     flex-grow: 1;
@@ -208,9 +200,7 @@
     padding: 30px;
 }
 
-/* ==========================================
-   PAGE HEADING
-========================================== */
+
 
 .page-heading {
     display: flex;
@@ -232,9 +222,7 @@
     font-size: 0.85rem;
 }
 
-/* ==========================================
-   BUTTONS
-========================================== */
+
 
 .btn-primary,
 .btn-secondary,
@@ -285,9 +273,7 @@
     background: var(--bg-main);
 }
 
-/* ==========================================
-   PUBLISHER STATISTICS
-========================================== */
+
 
 .publisher-stats {
     display: grid;
@@ -368,9 +354,7 @@
     color: #a855f7;
 }
 
-/* ==========================================
-   PUBLISHER WIDGET
-========================================== */
+
 
 .widget {
     min-width: 0;
@@ -401,9 +385,7 @@
     font-size: 0.8rem;
 }
 
-/* ==========================================
-   SEARCH
-========================================== */
+
 
 .search-box {
     display: flex;
@@ -438,9 +420,6 @@
     color: var(--text-muted);
 }
 
-/* ==========================================
-   PUBLISHER TABLE
-========================================== */
 
 .table-card {
     overflow: hidden;
@@ -511,9 +490,7 @@
     font-size: 0.8rem;
 }
 
-/* ==========================================
-   TABLE ACTIONS
-========================================== */
+
 
 .action-buttons {
     display: flex;
@@ -542,9 +519,6 @@
     border-color: #dc2626;
 }
 
-/* ==========================================
-   MODALS
-========================================== */
 
 .modal-overlay {
     position: fixed;
@@ -614,9 +588,7 @@ body.modal-open {
     color: #ef4444;
 }
 
-/* ==========================================
-   PUBLISHER FORM
-========================================== */
+
 
 .form-grid {
     display: grid;
@@ -677,9 +649,7 @@ body.modal-open {
     margin-top: 22px;
 }
 
-/* ==========================================
-   TOAST NOTIFICATIONS
-========================================== */
+
 
 #publisherMessage {
     position: fixed;
@@ -724,9 +694,7 @@ body.modal-open {
     }
 }
 
-/* ==========================================
-   DARK MODE
-========================================== */
+
 
 body.dark-mode .publisher-stat-icon.blue {
     color: #93c5fd;
@@ -760,9 +728,7 @@ body.dark-mode #publisherMessage.error {
     border-color: #991b1b;
 }
 
-/* ==========================================
-   RESPONSIVE DESIGN
-========================================== */
+
 
 @media (max-width: 1100px) {
     .publisher-stats {
@@ -887,12 +853,8 @@ body.dark-mode #publisherMessage.error {
         width: calc(100% - 24px);
     }
 }
-/* ==========================================
-   HTML COMPATIBILITY FIXES
-   Keep existing design unchanged
-========================================== */
 
-/* TOPBAR */
+
 .top-bar {
     min-height: 75px;
     background: var(--bg-card);
@@ -966,7 +928,7 @@ body.dark-mode #publisherMessage.error {
     background: #475569;
 }
 
-/* WIDGET HEADING */
+
 .widget-header h2 {
     color: var(--text-primary);
     font-size: 1rem;
@@ -974,7 +936,7 @@ body.dark-mode #publisherMessage.error {
     margin-bottom: 5px;
 }
 
-/* RESPONSIVE TOPBAR */
+
 @media (max-width: 768px) {
     .top-bar {
         padding: 15px 20px;
@@ -995,7 +957,7 @@ body.dark-mode #publisherMessage.error {
     }
 }
 
-/* MOBILE DARK MODE */
+
 @media (max-width: 600px) {
     .dark-mode-toggle span {
         display: none;

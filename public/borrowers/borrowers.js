@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // API ENDPOINTS
+
     const API_URL = `${window.location.origin}/api/borrowers`;
     const STUDENTS_API_URL = `${window.location.origin}/api/students`;
 
-    // DOM ELEMENTS
+
     const tableBody = document.getElementById('borrowerTableBody');
     const registerForm = document.getElementById('registerForm');
     const registerCard = document.getElementById('registerCard');
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let borrowers = [];
     let students = [];
 
-    // SAFE HTML OUTPUT
+
     function escapeHTML(value) {
         return String(value ?? '').replace(/[&<>"']/g, character => ({
             '&': '&amp;',
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })[character]);
     }
 
-    // API RESPONSE HANDLER
+
     async function fetchJSON(url, options = {}) {
         const response = await fetch(url, {
             ...options,
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return result;
     }
 
-    // DARK MODE
+
     function applyTheme() {
         const isDark = localStorage.getItem('theme') === 'dark';
 
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // LOGOUT
+
     const logoutBtn = document.getElementById('logoutBtn');
 
     if (logoutBtn) {
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // DISPLAY MESSAGES
+
     function showMessage(message, type = 'success') {
         if (!messageBox) return;
 
@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
         messageBox.className = 'message-box';
     }
 
-    // LOAD STUDENTS
+
     async function loadStudents() {
         studentSelect.innerHTML = `
             <option value="">Loading students...</option>
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // POPULATE STUDENT DROPDOWN
+
     function populateStudentSelect() {
         const availableStudents = students.filter(student =>
             Number(student.is_borrower) === 0
@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
         studentSelect.disabled = false;
     }
 
-    // DISPLAY SELECTED STUDENT DETAILS
+
     function displaySelectedStudent() {
         const studentId = studentSelect.value;
 
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     studentSelect.addEventListener('change', displaySelectedStudent);
 
-    // LOAD BORROWERS
+
     async function loadBorrowers() {
         tableBody.innerHTML = `
             <tr>
@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // DISPLAY BORROWER TABLE
+
     function displayBorrowers(list) {
         if (!list.length) {
             tableBody.innerHTML = `
@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
     }
 
-    // OPEN REGISTRATION FORM
+
     document.getElementById('showRegisterBtn').addEventListener('click', async () => {
         clearMessage();
 
@@ -272,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
         studentSelect.focus();
     });
 
-    // CLOSE REGISTRATION FORM
+
     document.getElementById('cancelRegisterBtn').addEventListener('click', () => {
         registerCard.hidden = true;
         registerForm.reset();
@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clearMessage();
     });
 
-    // REGISTER BORROWER
+
     registerForm.addEventListener('submit', async event => {
         event.preventDefault();
 
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // SEARCH BORROWERS
+
     searchInput.addEventListener('input', () => {
         const search = searchInput.value.trim().toLowerCase();
 
@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
         displayBorrowers(filtered);
     });
 
-    // REFRESH
+
     refreshBtn.addEventListener('click', async () => {
         clearMessage();
 
@@ -376,6 +376,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ]);
     });
 
-    // INITIAL LOAD
+
     loadBorrowers();
 });
